@@ -164,11 +164,12 @@ function Login() {
       };
       const authService = new AuthService()
       const response = await authService.login(myData);
+      
       console.log(response)
 
-      const token = response.access_token
+     // const token = response.access_token
 
-      localStorage.setItem("token", token);
+      //localStorage.setItem("token", token);
 
       return history.push("/admin/default");
 
@@ -180,6 +181,7 @@ function Login() {
       //   position: toast.POSITION.TOP_CENTER
       // }
       // );
+      console.log(err)
       if(err.errors)
       {
         setError(err.errors[0].detail)
