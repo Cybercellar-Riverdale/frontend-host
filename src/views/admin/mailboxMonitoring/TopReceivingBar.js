@@ -17,10 +17,25 @@ import Card from "components/card/Card.js";
 import { RiArrowUpSFill } from "react-icons/ri";
 
 export default function TopReceivingBar(props) {
-    const { ...rest } = props;
+    const { receiverDomains, ...rest } = props;
+
+    if (!receiverDomains) {
+        return null;
+    }
+
+    const entries = Object.entries(receiverDomains);
+
+    const sortedEntries = entries.sort((a, b) => b[1] - a[1]);
+    
+    const top4Entries = sortedEntries.slice(0, 4);
+    
+    const top4Urls = top4Entries.map(entry => entry[0]);
+    
+    const top4Values = top4Entries.map(entry => entry[1]);
+
     const barChartDataTopReceiving = [{
         name: "Number of Emails",
-        data: [80, 180, 250, 350],
+        data: top4Values,
     },
     ];
 
@@ -44,7 +59,7 @@ export default function TopReceivingBar(props) {
             theme: "dark",
         },
         xaxis: {
-            categories: ["example.com", "example.org", "example.ne", "example.edu"],
+            categories: top4Urls,
             show: false,
             labels: {
                 show: true,

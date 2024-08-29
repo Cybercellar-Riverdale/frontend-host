@@ -9,11 +9,28 @@ import React from "react";
 // import { pieChartDataTopReceiving, pieChartOptionsTopReceiving } from './charts';
 
 export default function TopReceivingPie(props) {
-    const { ...rest } = props;
-    const pieChartDataTopReceiving = [18, 46, 16, 20];
+    const { receiverDomains, ...rest } = props;
+
+    if (!receiverDomains) {
+        return null;
+    }
+
+    const entries = Object.entries(receiverDomains);
+
+    const sortedEntries = entries.sort((a, b) => b[1] - a[1]);
+    
+    const top4Entries = sortedEntries.slice(0, 4);
+    
+    const top4Urls = top4Entries.map(entry => entry[0]);
+    
+    const top4Values = top4Entries.map(entry => entry[1]);
+
+    const total = top4Values.reduce((acc, value) => acc + value, 0);
+    
+    const percentages = top4Values.map(value => Math.ceil((value / total) * 100));
 
     const pieChartOptionsTopReceiving = {
-        labels: ["demo.net", "test.com", "sample.org", "example.com"],
+        labels: top4Urls,
         colors: ["#F8766D", "#C77CFF", "#00BFC4", "#7CAE00"],
         chart: {
             width: "50px",
@@ -93,7 +110,7 @@ export default function TopReceivingPie(props) {
             <PieChart
                 h='100%'
                 w='100%'
-                chartData={pieChartDataTopReceiving}
+                chartData={percentages}
                 chartOptions={pieChartOptionsTopReceiving}
             />
             {/* <Card

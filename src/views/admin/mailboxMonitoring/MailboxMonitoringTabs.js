@@ -2,6 +2,7 @@ import Card from 'components/card/Card'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel, useColorMode, useColorModeValue, Table, Thead, Tr, Th, Flex, Tbody, Text, Icon, Td, SimpleGrid, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, FormControl, FormLabel, Input, Select, Button, } from '@chakra-ui/react'
 import { useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
+import axios from 'axios';
 import EmailProcessedLine from './EmailProcessedLine';
 import EmailProcessedBar from './EmailProcessedBar';
 import TrafficBreakDonut from './TrafficBreakDonut';
@@ -172,31 +173,40 @@ function MailboxMonitoringTabs() {
             Cell: ({ row }) => {
                 const handleSet = () => {
                     localStorage.setItem("email_id", JSON.stringify(row.original));
-                    window.location.href = `#/admin/emailanalysis/${row.original.email_id}`
+                    window.location.href = `#/admin/emailanalysis/${row.original.id}`
                 }
                 return (
-                    <Text onClick={handleSet} cursor='pointer'>{row.original.email_id}</Text>
+                    <Text onClick={handleSet} cursor='pointer'>{row.original.id}</Text>
                 )
             }
         },
         {
             Header: "SENDER",
             accessor: "sender",
+            Cell: ({ row }) => (
+                <Text>{row.original.senderEmail}</Text>
+            ),
         },
         {
             Header: "RECIPIENTS",
             accessor: "recipients",
+            Cell: ({ row }) => (
+                <Text>{row.original.recipient}</Text>
+            ),
         },
         {
             Header: "SUBJECT",
             accessor: "subject",
             Cell: ({ row }) => (
-                <Text>External Partner - {row.original.subject}</Text>
+                <Text>{row.original.subject}</Text>
             ),
         },
         {
             Header: "DATE",
             accessor: "date",
+            Cell: ({ row }) => (
+                <Text>{row.original.date}</Text>
+            ),
         },
         {
             Header: "FINAL ACTION",
@@ -213,400 +223,141 @@ function MailboxMonitoringTabs() {
         // },
 
     ], []);
-    const data = useMemo(() => [
-        {
-            "email_id": "1001",
-            "date": "2017-05-25",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1002",
-            "date": "2017-05-25",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Quarantined",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1003",
-            "date": "2017-05-25",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Sent",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1014",
-            "date": "2017-05-12",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Quarantined",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1004",
-            "date": "2017-05-12",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Sent",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1005",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1006",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Quarantined",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1007",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1008",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Sent",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1009",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1010",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1011",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Quarantined",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1012",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Sent",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1013",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1001",
-            "date": "2017-05-25",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1002",
-            "date": "2017-05-25",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Quarantined",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1003",
-            "date": "2017-05-25",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Sent",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1014",
-            "date": "2017-05-12",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Quarantined",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1004",
-            "date": "2017-05-12",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Sent",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1005",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1006",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Quarantined",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1007",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1008",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Sent",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1009",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1010",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1011",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Quarantined",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1012",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Sent",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
-        },
-        {
-            "email_id": "1013",
-            "date": "2017-05-10",
-            "sender": "esteele@training.pro",
-            "recipients": "cwarren@training.proofpoint.com",
-            "subject": "Eric Steele and Associates",
-            "final_action": "Continued",
-            "attack_score": 8,
-            "attackType": "Malware",
-            "campaign_recipient": "Tyler Finkey",
-            "email": "tylerfinky@gmail.com",
-            "from": "DocuSign Signature Service",
-            "receivedDate": "2017-05-25"
+
+    const [data, setData] = useState([]);
+
+    const [months, setMonths] = useState(null);
+
+      const [days, setDays] = useState(null);
+
+      const [emailTraffic, setEmailTraffic] = useState(null);
+
+      const [senderDomains, setSenderDomains] = useState(null);
+
+      const [receiverDomains, setReceiverDomains] = useState(null);
+
+    const [loading, setLoading] = useState(true);
+
+    const tallyEmailCategories = async (arrayOfObjects) => {
+        const emailCategories = {
+            clean: 0,
+            phishing: 0,
+            malicious: 0,
+            unrated: 0
+        };
+
+        arrayOfObjects.forEach(obj => {
+            const { emailCategory } = obj;
+            if (emailCategories[emailCategory] != undefined ) {
+                emailCategories[emailCategory]++;
+            }
+        });
+
+        setEmailTraffic(emailCategories);
+    };
+
+    const tallyDaysAndMonths = async (arrayOfObjects) => {
+        // Initialize tally objects for days of the week and months
+        const dayTally = {
+          Monday: 0,
+          Tuesday: 0,
+          Wednesday: 0,
+          Thursday: 0,
+          Friday: 0,
+          Saturday: 0,
+          Sunday: 0
+        };
+        
+        const monthTally = {
+          January: 0,
+          February: 0,
+          March: 0,
+          April: 0,
+          May: 0,
+          June: 0,
+          July: 0,
+          August: 0,
+          September: 0,
+          October: 0,
+          November: 0,
+          December: 0
+        };
+      
+        // Iterate over the array of objects
+        arrayOfObjects.forEach(obj => {
+          const { day, month } = obj;
+      
+          // Increment the corresponding day tally
+          if (dayTally[day] !== undefined) {
+            dayTally[day]++;
+          }
+      
+          // Increment the corresponding month tally
+          if (monthTally[month] !== undefined) {
+            monthTally[month]++;
+          }
+        });
+      
+        setDays(dayTally);
+        setMonths(monthTally);
+      };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/incident/get-mailbox'); // Replace with your actual API endpoint
+                console.log("FETCHED DATA: ", response.data);
+                setData(response.data);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const getTopSenderDomains = async (array) => {
+        let senderDomainTally = {};
+        array.forEach((obj) => {
+            const { senderDomain } = obj;
+            if (senderDomain!==undefined) {
+                if (senderDomainTally[senderDomain] !== undefined ) {
+                    senderDomainTally[senderDomain]++;
+                } else {
+                    senderDomainTally[senderDomain] = 0;
+                }
+            }
+        });
+
+        setSenderDomains(senderDomainTally);
+    }
+
+    const getTopReceiverDomains = async (array) => {
+        let receiverDomainTally = {};
+        array.forEach((obj) => {
+            const { receiverDomain } = obj;
+            if (receiverDomain!==undefined) {
+                if (receiverDomainTally[receiverDomain] !== undefined ) {
+                    receiverDomainTally[receiverDomain]++;
+                } else {
+                    receiverDomainTally[receiverDomain] = 0;
+                }
+            }
+        });
+
+        setReceiverDomains(receiverDomainTally);
+    }
+
+    useEffect(() => {
+        if (data.length > 0) {
+          tallyDaysAndMonths(data);
+          tallyEmailCategories(data);
+          getTopSenderDomains(data);
+          getTopReceiverDomains(data);
         }
-    ], []);
+      }, [data]);
 
     const { colorMode } = useColorMode();
 
@@ -781,23 +532,23 @@ function MailboxMonitoringTabs() {
                                 overflowX={{ sm: "scroll", lg: "auto" }}
                             >
                                 <Text fontSize='26px' fontWeight='700' >Total Email Processed</Text>
-                                <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
-                                    <EmailProcessedLine />
-                                    <EmailProcessedBar />
+                                <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>                                    
+                                {!loading && months && <EmailProcessedLine months={months} />}
+                                {!loading && months && <EmailProcessedBar days={days} />}                            
                                 </SimpleGrid>
                                 <Text fontSize='26px' fontWeight='700' >Email Traffic Breakdown</Text>
                                 <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
-                                    <TrafficBreakDonut />
-                                    <TrafficBreakBar />
+                                {!loading && months && <TrafficBreakDonut emailTraffic={emailTraffic} />}
+                                {!loading && months && <TrafficBreakBar emailTraffic={emailTraffic} />}                                    
                                 </SimpleGrid>
                                 <Text fontSize='26px' fontWeight='700' >Top Sending and Receiving Domains</Text>
                                 <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
-                                    <TopSendingBar />
-                                    <TopReceivingBar />
+                                    <TopSendingBar senderDomains={senderDomains} />
+                                    <TopReceivingBar receiverDomains={receiverDomains} />
                                 </SimpleGrid>
                                 <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
-                                    <TopSendingPie />
-                                    <TopReceivingPie />
+                                    <TopSendingPie senderDomains={senderDomains} />
+                                    <TopReceivingPie receiverDomains={receiverDomains} />
                                 </SimpleGrid>
                                 <Text fontSize='26px' fontWeight='700' >Inbound vs Outbound Traffic</Text>
                                 <SimpleGrid columns={{ base: 1, md: 1, xl: 1 }} gap='20px' mb='20px'>

@@ -42,6 +42,16 @@ class AuthService {
     const updateProfile = "me";
     return await HttpService.patch(updateProfile, newInfo);
   }
+  quarantine = async (messageId) => {
+    const quarantineEndpoint = 'quarantine';
+    return await HttpService.post(quarantineEndpoint, {
+        data: {
+          attributes: {
+            messageId: messageId,
+          }
+        }
+      });
+  }
 }
 
 export default AuthService;

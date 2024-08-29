@@ -17,10 +17,14 @@ import Card from "components/card/Card.js";
 import { RiArrowUpSFill } from "react-icons/ri";
 
 export default function EmailProcessedBar(props) {
-    const { ...rest } = props;
+    const { days, ...rest } = props;
+    const dayNames = [
+        'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+    ];
+    const dayArray = dayNames.map(day => days[day] || 0);
     const barChartDataEmailProcessed = [{
         name: "Number of Emails Processed",
-        data: [50, 30, 20, 40, 50, 28, 10],
+        data: dayArray,
     },
     ];
     

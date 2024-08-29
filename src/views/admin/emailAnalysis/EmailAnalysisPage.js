@@ -4,23 +4,20 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import SPFCheckPie from '../incidentLog/SPFCheckPie';
+import SPFResult from '../incidentLog/SPFResult';
 import DKIMCheckPie from '../incidentLog/DKIMCheckPie';
 import DMARCCheckPie from '../incidentLog/DMARCCheckPie';
-import axios from 'axios';
-import ReactJson from 'react-json-view';
+import GaugeChart from './GaugeChart';
+import AuthService from 'services/auth-service';
 
 let details = '';
+
 function EmailAnalysisPage() {
     const [emailDetails, setEmailDetails] = useState('');
-    const [emailDetectionReports,setEmailDetectionReports] = useState({});
-    // state = {
-    //     'ip_check' : {},
-    //     'file_analysis' : {},
-    //     ..
-    // }
     const location = useLocation();
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isRemediationOpen, onOpen: onRemediationOpen, onClose: onRemediationClose } = useDisclosure();
+    const { isOpen: isGaugeChartOpen, onOpen: onGaugeChartOpen, onClose: onGaugeChartClose } = useDisclosure();
 
     // Load email details from local storage or state
     useEffect(() => {
@@ -34,103 +31,6 @@ function EmailAnalysisPage() {
             setEmailDetails(location.state.emailDetails);
         }
     }, [location.state]);
-
-    // useEffect(async ()=>{
-    //     const response = await axios.post(
-    //         'https://api.sapling.ai/api/v1/edits',
-    //         {
-    //             "key": 'QUSJQPH4OQSWFO51YVZPLQCUJOGF6B83', // replace with your API key
-    //             "session_id": 'test session',
-    //             "text":'hello',
-    //         },
-    //     );
-	// 	console.log(response)
-    //     setemailDetectionReports(response)
-
-    //     // var temp_state = {...emailDetectionReports}
-    //     // temp_state['file_analysis'] = response
-    //     // setemailDetectionReports(temp_state)
-
-    //     console.log(emailDetectionReports)
-    // },[])
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const ip_check_response = await axios.post(
-                    'https://api.sapling.ai/api/v1/edits',
-                    {
-                        key: 'QUSJQPH4OQSWFO51YVZPLQCUJOGF6B83', // replace with your API key
-                        session_id: 'test session',
-                        text: 'hello',
-                    },
-                );
-                if (ip_check_response.data) {
-                    setEmailDetectionReports({
-                        ip_check : ip_check_response
-                    });
-                } else {
-                    console.error('Unexpected response structure:', ip_check_response);
-                }
-
-                const domain_analysis_response = await axios.post(
-                    'https://api.sapling.ai/api/v1/sentiment',
-                    {
-                        key: 'QUSJQPH4OQSWFO51YVZPLQCUJOGF6B83',
-                        "text":"17 warnings have detailed information that is not shown.",
-                    },
-                );
-                if (domain_analysis_response.data) {
-                    var temp_state = {...emailDetectionReports}
-                    temp_state['domain_analysis'] = domain_analysis_response
-                    setEmailDetectionReports(temp_state)
-                } else {
-                    console.error('Unexpected response structure:', domain_analysis_response);
-                }
-
-                const link_analysis_response = await axios.post(
-                    'https://api.sapling.ai/api/v1/tone',
-                    {
-                        key: 'QUSJQPH4OQSWFO51YVZPLQCUJOGF6B83',
-                        "text":"Failed to parse source map from '/mnt/s/work/Cybercellar/cybercellar-frontend/node_modules/react-bootstrap-sweetalert/src/styles/SweetAlertStyles.ts'",
-                    },
-                );
-                if (link_analysis_response.data) {
-                    var temp_state = {...emailDetectionReports}
-                    temp_state['link_analysis'] = link_analysis_response
-                    setEmailDetectionReports(temp_state)
-                } else {
-                    console.error('Unexpected response structure:', link_analysis_response);
-                }
-
-                const file_analysis_response = await axios.post(
-                    'https://api.sapling.ai/api/v1/edits',
-                    {
-                        key: 'QUSJQPH4OQSWFO51YVZPLQCUJOGF6B83', // replace with your API key
-                        session_id: 'test session',
-                        text: 'WARNING in ./node_modules/react-bootstrap-sweetalert/dist/styles/SweetAlertStyles.js',
-                    },
-                );
-                if (domain_analysis_response.data) {
-                    var temp_state = {...emailDetectionReports}
-                    temp_state['file_analysis'] = file_analysis_response
-                    setEmailDetectionReports(temp_state)
-                } else {
-                    console.error('Unexpected response structure:', file_analysis_response);
-                }
-
-            } catch (err) {
-                console.error('API call error:', err.message);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        console.log('Updated emailDetectionReports state:', emailDetectionReports);
-    }, [emailDetectionReports]);
-
     const textColor = useColorModeValue("secondaryGray.900", "white");
     const borderTopColor = useColorModeValue("black", "white");
     const buttonBgColor = useColorModeValue("blackAlpha.100", "blackAlpha.300");
@@ -185,6 +85,36 @@ function EmailAnalysisPage() {
     } = tableInstance;
     initialState.pageSize = 5;
 
+    let ipAddress = null;
+    let ipAnalysisStats = null;
+    let no_of_vendors = 0;
+    let malicious_stats = 0;
+    let ipCountry = null;
+    
+    if (emailDetails && emailDetails.ipAnalysis && emailDetails.ipAnalysis.data.id && emailDetails.ipAnalysis.data && emailDetails.ipAnalysis.data.attributes && emailDetails.ipAnalysis.data.attributes.last_analysis_stats && emailDetails.ipAnalysis.data.attributes.country) {
+        ipAnalysisStats = emailDetails.ipAnalysis.data.attributes.last_analysis_stats;
+        no_of_vendors = Object.values(ipAnalysisStats).reduce((a, b) => a + b, 0);
+        ipCountry = emailDetails.ipAnalysis.data.attributes.country;
+        ipAddress = emailDetails.ipAnalysis.data.id;
+        console.log("NO OF VENDORS", no_of_vendors);
+        malicious_stats = ipAnalysisStats.malicious;
+        console.log(malicious_stats);
+    } else {
+        console.log("ipAnalysis or necessary fields are missing in emailDetails");
+    }
+
+    const handleQuarantine = async() => {
+        try {
+            const authService = new AuthService();
+            const response = await authService.quarantine(emailDetails.id);
+            console.log(response);
+            //return history.push("/admin/mailboxmonitoring");
+            window.location.href = "/admin/mailboxmonitoring";
+        } catch (error) {
+            console.log("Quarantine Handler Error: ", error);
+        }
+    }
+
     return (
         // <div>Hello{emailId.email_id}</div>
         <Card>
@@ -202,9 +132,9 @@ function EmailAnalysisPage() {
                 </div>
             )} */}
             <Flex align='center' justify='flex-end'>
-                <Button onClick={onOpen} borderRadius={5} backgroundColor={buttonBgColor} >Remediation</Button>
+                <Button onClick={onRemediationOpen} borderRadius={5} backgroundColor={buttonBgColor} >Remediation</Button>
             </Flex>
-            <Modal isOpen={isOpen} onClose={onClose} >
+            <Modal isOpen={isRemediationOpen} onClose={onRemediationClose}>
                 <ModalOverlay />
                 <ModalContent maxW='-webkit-fit-content'>
                     <ModalHeader></ModalHeader>
@@ -218,6 +148,7 @@ function EmailAnalysisPage() {
                                         color: 'white',           // Keeps the text color unchanged on hover
                                     }
                                 }}
+                                onClick={handleQuarantine}
                             >Quarantine</Button>
                             <Button backgroundColor='green.300' color='white' borderRadius={5}
                                 sx={{
@@ -259,7 +190,7 @@ function EmailAnalysisPage() {
                         </SimpleGrid>
                     </ModalBody>
                     <ModalFooter margin='auto'>
-                        <Button onClick={onClose} backgroundColor='red.500' color='white' w='80px'
+                        <Button onClick={onRemediationClose} backgroundColor='red.500' color='white' w='80px'
                             fontWeight='500' borderRadius={5}
                             sx={{
                                 _hover: {
@@ -338,19 +269,19 @@ function EmailAnalysisPage() {
                         <FormControl isReadOnly>
                             <Flex align='center'>
                                 <FormLabel w='152px'>Name :</FormLabel>
-                                <Input value={emailDetails.campaign_recipient} color={textColor} />
+                                <Input value={emailDetails.senderName} color={textColor} />
                             </Flex>
                         </FormControl>
                         <FormControl isReadOnly mt={4} >
                             <Flex align='center'>
                                 <FormLabel w='152px'>Email :</FormLabel>
-                                <Input value={emailDetails.email} color={textColor} />
+                                <Input value={emailDetails.senderEmail} color={textColor} />
                             </Flex>
                         </FormControl>
                         <FormControl isReadOnly mt={4}>
                             <Flex align='center'>
                                 <FormLabel w='152px'>Domain :</FormLabel>
-                                <Input color={textColor} />
+                                <Input value={emailDetails.senderDomain} color={textColor} />
                             </Flex>
                         </FormControl>
                         <FormControl isReadOnly mt={4}>
@@ -362,7 +293,7 @@ function EmailAnalysisPage() {
                         <FormControl isReadOnly mt={4}>
                             <Flex align='center'>
                                 <FormLabel w='152px'>IP :</FormLabel>
-                                <Input color={textColor} />
+                                <Input value={emailDetails.senderIP} color={textColor} />
                             </Flex>
                         </FormControl>
                         <FormControl isReadOnly mt={4}>
@@ -393,19 +324,19 @@ function EmailAnalysisPage() {
                         <FormControl isReadOnly mt={4} >
                             <Flex align='center'>
                                 <FormLabel w='152px'>Message Id :</FormLabel>
-                                <Input value={emailDetails.email_id} color={textColor} />
+                                <Input value={emailDetails.id} color={textColor} />
                             </Flex>
                         </FormControl>
                         <FormControl isReadOnly mt={4}>
                             <Flex align='center'>
                                 <FormLabel w='152px'>Recipient :</FormLabel>
-                                <Input value={emailDetails.campaign_recipient} color={textColor} />
+                                <Input value={emailDetails.recipient} color={textColor} />
                             </Flex>
                         </FormControl>
                         <FormControl isReadOnly mt={4}>
                             <Flex align='center'>
                                 <FormLabel w='152px'>Sender :</FormLabel>
-                                <Input value={emailDetails.from} color={textColor} />
+                                <Input value={emailDetails.senderEmail} color={textColor} />
                             </Flex>
                         </FormControl>
                         <FormControl isReadOnly mt={4}>
@@ -417,7 +348,7 @@ function EmailAnalysisPage() {
                         <FormControl isReadOnly mt={4}>
                             <Flex align='center'>
                                 <FormLabel w='152px'>Date :</FormLabel>
-                                <Input value={emailDetails.receivedDate} color={textColor} />
+                                <Input value={emailDetails.date} color={textColor} />
                             </Flex>
                         </FormControl>
                     </di>
@@ -437,7 +368,8 @@ function EmailAnalysisPage() {
                     <TabPanels>
                         <TabPanel>
                             <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb='20px'>
-                                <SPFCheckPie />
+                                {/*<SPFCheckPie status={emailDetails.spf}/>*/}
+                                <SPFResult status={emailDetails.spf} />
                                 <DKIMCheckPie />
                             </SimpleGrid>
                             <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb='5px'>
@@ -445,8 +377,37 @@ function EmailAnalysisPage() {
                             </SimpleGrid>
                         </TabPanel>
                         <TabPanel>
-                            <Textarea
-                                value={JSON.stringify(emailDetectionReports['ip_check'], null, 2)}
+                        <GaugeChart value={malicious_stats} total={no_of_vendors} onClick={onGaugeChartOpen}/>
+                            <Modal isOpen={isGaugeChartOpen} onClose={onGaugeChartClose} >
+                                <ModalOverlay />
+                                <ModalContent maxW='-webkit-fit-content'>
+                                <ModalHeader></ModalHeader>
+                                <ModalCloseButton />
+                                <ModalBody mt={4}>
+                                
+                                <Textarea value={`IP Address: ${JSON.stringify(ipAddress, null, 1)} \n Vendor Analysis: ${JSON.stringify(ipAnalysisStats, null, 1)} \n Country: ${JSON.stringify(ipCountry, null, 1)} \n `} readOnly width="400px" height="400px" />                                    
+                                </ModalBody>
+                                </ModalContent>
+                            </Modal>
+                        {/*
+                        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb='20px'>
+                                <GaugeChart value={malicious_stats} total={no_of_vendors} />    
+                                <Textarea
+                                value={JSON.stringify(emailDetails.ipAnalysis, null, 1)}
+                                readOnly
+                                width="100%"
+                                height="400px"
+                                fontFamily="monospace"
+                                bgColor="gray.100"
+                                color="black"
+                                p={4}
+                        />
+                        </SimpleGrid>
+                        */}
+                        </TabPanel>
+                        <TabPanel>
+                        <Textarea
+                                value={JSON.stringify(emailDetails.domainAnalysis, null, 2)}
                                 readOnly
                                 width="100%"
                                 height="400px"
@@ -458,31 +419,7 @@ function EmailAnalysisPage() {
                         </TabPanel>
                         <TabPanel>
                         <Textarea
-                                value={JSON.stringify(emailDetectionReports['domain_analysis'], null, 2)}
-                                readOnly
-                                width="100%"
-                                height="400px"
-                                fontFamily="monospace"
-                                bgColor="gray.100"
-                                color="black"
-                                p={4}
-                            />
-                        </TabPanel>
-                        <TabPanel>
-                        <Textarea
-                                value={JSON.stringify(emailDetectionReports['link_analysis'], null, 2)}
-                                readOnly
-                                width="100%"
-                                height="400px"
-                                fontFamily="monospace"
-                                bgColor="gray.100"
-                                color="black"
-                                p={4}
-                            />
-                        </TabPanel>
-                        <TabPanel>
-                        <Textarea
-                                value={JSON.stringify(emailDetectionReports['file_analysis'], null, 2)}
+                                value={JSON.stringify(emailDetails.analysisArray, null, 2)}
                                 readOnly
                                 width="100%"
                                 height="400px"
@@ -495,20 +432,20 @@ function EmailAnalysisPage() {
                     </TabPanels>
                 </Tabs>
             </Card>
-            <Text fontSize='24px' fontWeight='700' mt={2} style={{display:'none'}}>Content Analysis</Text>
-            <Card boxShadow={cardShadow} style={{display:'none'}}>
+            <Text fontSize='24px' fontWeight='700' mt={2}>Content Analysis</Text>
+            <Card boxShadow={cardShadow} >
                 <Flex align='center' justify='space-between'>
                     <Card width='70%'>
                         <FormControl>
                             <Flex align='center'>
                                 <FormLabel width='100px'>From:</FormLabel>
-                                <Input value={emailDetails.email} type='text' color={textColor} isReadOnly />
+                                <Input value={emailDetails.senderEmail} type='text' color={textColor} isReadOnly />
                             </Flex>
                         </FormControl>
                         <FormControl mt={2}>
                             <Flex align='center'>
                                 <FormLabel width='100px'>To:</FormLabel>
-                                <Input value={emailDetails.campReciepEmail} type='text' color={textColor} isReadOnly />
+                                <Input value={emailDetails.recipient} type='text' color={textColor} isReadOnly />
                             </Flex>
                         </FormControl>
                         <FormControl mt={2}>
@@ -519,36 +456,23 @@ function EmailAnalysisPage() {
                         </FormControl>
                         <FormControl mt={2}>
                             <Flex align='center'>
-                                <FormLabel width='100px'></FormLabel>
-                                <Textarea placeholder='Message Body...' rows={6} color={textColor} />
+                            <FormLabel width='100px'>Message Body:</FormLabel>
+                                <Textarea value={emailDetails.body} placeholder='Message Body...' rows={6} color={textColor} />
                             </Flex>
                         </FormControl>
                         {/* <Divider mt={2} /> */}
                         <SimpleGrid columns={{ base: 1, md: 3, xl: 3 }} gap="20px" mt='5px' borderTop={`1px solid ${borderTopColor}`}>
                             <FormControl>
                                 <FormLabel>Language Score</FormLabel>
-                                <Input value='8' color={textColor} />
+                                <Input value={emailDetails.score_analysis} color={textColor} />
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Sentiment</FormLabel>
-                                <Select color={textColor} sx={{ option: { color: textColor } }}>
-                                    <option>Positive</option>
-                                    <option>Negative</option>
-                                </Select>
+                                <Input value={emailDetails.sentiment_analysis} type='text' color={textColor} isReadOnly />                    
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Tone</FormLabel>
-                                <Select color={textColor} sx={{ option: { color: textColor } }}>
-                                    <option>Excitement</option>
-                                    <option>Joy</option>
-                                    <option>Anger</option>
-                                    <option>Fear</option>
-                                    <option>Surprise</option>
-                                    <option>Disgust</option>
-                                    <option>Anticipation</option>
-                                    <option>Trust</option>
-                                    <option>None</option>
-                                </Select>
+                                <Input value={emailDetails.tone_analysis} type='text' color={textColor} isReadOnly />                                                
                             </FormControl>
                         </SimpleGrid>
                     </Card>

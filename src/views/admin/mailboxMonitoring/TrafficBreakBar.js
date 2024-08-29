@@ -17,10 +17,12 @@ import {
 import { RiArrowUpSFill } from "react-icons/ri";
 
 export default function TrafficBreakBar(props) {
-    const { ...rest } = props;
+    const { emailTraffic, ...rest } = props;
+    const trafficNames = [ 'clean', 'phishing', 'malicious', 'unrated' ];
+    const trafficArray = trafficNames.map(traffic => emailTraffic[traffic] || 0);
     const barChartDataTrafficBreak = [{
         name: "Email Traffic Breakdown",
-        data: [50, 30, 20, 40, 50,],
+        data: trafficArray,
     },
     ];
 
@@ -44,7 +46,7 @@ export default function TrafficBreakBar(props) {
             theme: "dark",
         },
         xaxis: {
-            categories: ["SPAM", "MALWARE", "PHISHING", "LEGITIMATE", "SUSPICIOUS",],
+            categories: ["CLEAN", "PHISHING", "MALICIOUS", "UNRATED"],
             show: false,
             labels: {
                 show: true,

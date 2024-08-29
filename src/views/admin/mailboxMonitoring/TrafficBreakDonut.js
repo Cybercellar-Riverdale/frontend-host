@@ -5,10 +5,12 @@ import DonutChart from "components/charts/DonutChart";
 // import { donutChartDataTrafficBreak, donutChartOptionsTrafficBreak } from "variables/charts";
 // import { donutChartDataTrafficBreak, donutChartOptionsTrafficBreak } from './charts';
 export default function TrafficBreakDonut(props) {
-    const { ...rest } = props;
-    const donutChartDataTrafficBreak = [10, 18, 31, 41, 50];
+    const { emailTraffic, ...rest } = props;
+    const trafficNames = [ 'clean', 'phishing', 'malicious', 'unrated' ];
+    const trafficArray = trafficNames.map(traffic => emailTraffic[traffic] || 0);
+    const donutChartDataTrafficBreak = trafficArray;
     const donutChartOptionsTrafficBreak = {
-        labels: ["Spam", "Malware", "Phishing", "Legitimate", "Suspicious"],
+        labels: ["Clean", "Phishing", "Malicious", "Unrated"],
         colors: ["#10B981", "#F59E0B", "#F43F5E", "#8B5CF6", "#3B82F6"],
         plotOptions: {
             pie: {

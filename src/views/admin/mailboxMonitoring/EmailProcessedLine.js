@@ -23,11 +23,17 @@ import { RiArrowUpSFill } from "react-icons/ri";
 // import { lineChartDataEmailProcessed, lineChartOptionsEmailProcessed } from './charts'
 
 export default function EmailProcessedLine(props) {
-    const { ...rest } = props;
+    const {months, ...rest } = props;
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June', 
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      
+    const monthArray = monthNames.map(month => months[month] || 0);
     const lineChartDataEmailProcessed = [
         {
             name: "Total Email Processed",
-            data: [2, 5, 3, 2, 4, 6, 8, 10, 5, 7, 3, 6],
+            data: monthArray,
         },
         // {
         //   name: "Total",

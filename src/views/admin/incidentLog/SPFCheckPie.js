@@ -8,7 +8,7 @@ import { VSeparator } from "components/separator/Separator";
 import React from "react";
 
 export default function SPFCheckPie(props) {
-    const { ...rest } = props;
+    const { status, ...rest } = props;
     const pieChartDataSPFCheck = [31, 33, 36];
 
     const pieChartOptionsSPFCheck = {
@@ -74,9 +74,11 @@ export default function SPFCheckPie(props) {
                 alignItems='center'
                 w='100%'
                 mb='8px'>
-                <Text color={textColor} fontSize='xl' fontWeight='600' mt='4px'>
-                    SPF Check Distribution
-                </Text>
+
+            <Text color={textColor} fontSize='xl' fontWeight='600' mt='4px'>
+                    SPF Checks Distribution
+            </Text>
+        
                 {/* <Select
           fontSize='sm'
           variant='subtle'
@@ -95,7 +97,7 @@ export default function SPFCheckPie(props) {
                 chartData={pieChartDataSPFCheck}
                 chartOptions={pieChartOptionsSPFCheck}
             />
-            {/* <Card
+             <Card
                 bg={cardColor}
                 flexDirection='row'
                 boxShadow={cardShadow}
@@ -135,7 +137,7 @@ export default function SPFCheckPie(props) {
                         25%
                     </Text>
                 </Flex>
-            </Card> */}
+            </Card>
         </Card>
     );
 }

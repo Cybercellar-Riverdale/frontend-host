@@ -262,6 +262,9 @@ function IncidentAnalysisTabs() {
             )
         }
     ], []);
+
+
+
     const data = useMemo(() => [
         {
             "email_id": "1001",
@@ -443,6 +446,7 @@ function IncidentAnalysisTabs() {
                                     <BlockEmailsLine />
                                     <BlockedEmailsBar />
                                 </SimpleGrid>
+                                {/*
                                 <Text fontSize='26px' fontWeight='700'>Sandboxing Results</Text>
                                 <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
                                     <EmailStatusSandBoxPie />
@@ -452,6 +456,7 @@ function IncidentAnalysisTabs() {
                                     <DetectedByClientBar />
                                     <ThreatsFromDomainBar />
                                 </SimpleGrid>
+                                */}
                             </Card>
                         </TabPanel>
                     </TabPanels>

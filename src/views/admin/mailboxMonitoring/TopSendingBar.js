@@ -1,7 +1,7 @@
 import React from "react";
 
 // Chakra imports
-import { Box, Flex, Icon, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, Flex, Icon, Text, Textarea, useColorModeValue } from "@chakra-ui/react";
 import BarChart from "components/charts/BarChart";
 
 // Custom components
@@ -17,10 +17,26 @@ import {
 import { RiArrowUpSFill } from "react-icons/ri";
 
 export default function TopSendingBar(props) {
-    const { ...rest } = props;
+    const { senderDomains, ...rest } = props;
+
+    if (!senderDomains) {
+        return null;
+    }
+
+    const entries = Object.entries(senderDomains);
+
+    const sortedEntries = entries.sort((a, b) => b[1] - a[1]);
+    
+    const top4Entries = sortedEntries.slice(0, 4);
+    
+    const top4Urls = top4Entries.map(entry => entry[0]);
+    
+    const top4Values = top4Entries.map(entry => entry[1]);
+
+
     const barChartDataTopSending = [{
         name: "Number of Emails",
-        data: [350, 230, 180, 80],
+        data: top4Values,
     },
     ];
 
@@ -44,7 +60,7 @@ export default function TopSendingBar(props) {
             theme: "dark",
         },
         xaxis: {
-            categories: ["example.com", "example.org", "example.ne", "example.edu"],
+            categories: top4Urls,
             show: false,
             labels: {
                 show: true,
@@ -136,6 +152,9 @@ export default function TopSendingBar(props) {
                     lineHeight='100%'>
                     Top Sending Domains
                 </Text>
+                {/*<Textarea value={JSON.stringify(senderDomains, null, 1)} />
+                <Textarea value={top4Urls} /> */}
+                <Textarea value={top4Urls} />
                 {/* <Flex align='center'>
                     <Icon as={RiArrowUpSFill} color='green.500' />
                     <Text color='green.500' fontSize='sm' fontWeight='700'>

@@ -10,7 +10,7 @@ import React from "react";
 export default function RealTimeThreatPie(props) {
     const { ...rest } = props;
 
-    const pieChartDataDistributionThreat = [10, 18, 31, 41];
+    const pieChartDataDistributionThreat = [10, 18, 37, 35];
 
     const pieChartOptionsDistributionThreat = {
         labels: ["Critical", "Low", "Medium", "High",],
