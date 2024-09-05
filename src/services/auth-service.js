@@ -13,6 +13,11 @@ class AuthService {
     return await HttpService.post(registerEndpoint, credentials);
   };
 
+  addUser=async(data)=>{
+    const addUserEndpoint='addUser';
+    return await HttpService.post(addUserEndpoint, data);
+  }
+
   logout = async () => {
     const logoutEndpoint = 'logout';
     return await HttpService.post(logoutEndpoint);
@@ -37,7 +42,6 @@ class AuthService {
     const updateProfile = "me";
     return await HttpService.patch(updateProfile, newInfo);
   }
-
   quarantine = async (messageId) => {
     const quarantineEndpoint = 'quarantine';
     return await HttpService.post(quarantineEndpoint, {

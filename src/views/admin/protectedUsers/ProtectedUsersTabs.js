@@ -13,6 +13,7 @@ import UserTrainingRatesDonut from './UserTrainingRatesDonut';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'
 import EdtiUser from './EdtiUser';
+import AuthService from 'services/auth-service';
 
 export function ProtectedUsersTable({ columns, data }) {
     const { colorMode } = useColorMode();
@@ -443,11 +444,8 @@ function ProtectedUsersTabs() {
     };
 
     const initialValues = {
-        vendoremail: '',
-        username: '',
-        permission: 'User',
-        tags: '--Select Tags--',
-        department: '--Select Department--'
+        email: '',
+        name: '',
     };
     const [userDetails, setUserDetails] = useState(initialValues);
     const [active, setActive] = useState("Inactive");
@@ -460,47 +458,72 @@ function ProtectedUsersTabs() {
         setActive((prevActive) => (prevActive === 'Active' ? 'Inactive' : 'Active'));
     };
 
-    const handleUserSave = () => {
-        if (!userDetails.vendoremail) {
-            toast.error('Please enter a employee id', {
+    const handleUserSave = async () => {
+       try{
+        if (!userDetails.email) {
+            toast.error('Please enter an email', {
                 position: toast.POSITION.TOP_CENTER,
                 theme: colorMode,
             }
             );
         }
-        else if (!userDetails.username) {
-            toast.error('Please enter a username', {
+        else if (!userDetails.name) {
+            toast.error('Please enter a name', {
                 position: toast.POSITION.TOP_CENTER,
                 theme: colorMode,
             }
             );
         }
-        else if (userDetails.tags === '--Select Tags--') {
-            toast.error('Please select a tag', {
-                position: toast.POSITION.TOP_CENTER,
-                theme: colorMode,
-            }
-            );
-        }
-        else if (userDetails.department === '--Select Department--') {
-            toast.error('Please select a department', {
-                position: toast.POSITION.TOP_CENTER,
-                theme: colorMode,
-            }
-            );
-        }
+       
+    
         else {
             console.log("Edited:", userDetails);
             console.log("Active:", active);
+            /*************************************** */
+
+            const newUser = { name: userDetails.name, email: userDetails.email};
+
+            const myData = {
+                data: {
+                type: "users",
+                attributes: { ...newUser },
+                relationships: {
+                    roles: {
+                    data: [
+                        {
+                        type: "roles",
+                        id: "1",
+                        },
+                    ],
+                    },
+                },
+                },
+            };
+
+            const authService = new AuthService()
+            const response = await authService.addUser(myData);
+      
+      console.log(response)
+
+
+            /*************************************** */
+           
             toast.success('User Created Successfully', {
                 position: toast.POSITION.TOP_CENTER,
                 theme: colorMode,
             }
             );
+            
             setUserDetails(initialValues);
             onClose();
         }
     }
+    catch(err){
+        if(err){
+            toast.error(err.message)
+        }
+    }
+}
 
 
     return (
@@ -623,38 +646,15 @@ function ProtectedUsersTabs() {
                                     </Flex>
                                     <ModalBody>
                                         <FormControl isRequired >
-                                            <FormLabel>Employee Id</FormLabel>
-                                            <Input placeholder='Enter employee id' color={textColor} value={userDetails.vendoremail} id='vendoremail' name='vendoremail' onChange={handleChange} />
+                                            <FormLabel>Email</FormLabel>
+                                            <Input placeholder='Enter email' color={textColor} value={userDetails.email} id='email' name='email' onChange={handleChange} />
                                         </FormControl>
                                         <FormControl mt={4} isRequired >
-                                            <FormLabel>Username</FormLabel>
-                                            <Input placeholder='Enter username' color={textColor} value={userDetails.username} id='username' name='username' onChange={handleChange} />
+                                            <FormLabel>Name</FormLabel>
+                                            <Input placeholder='Enter Name' color={textColor} value={userDetails.name} id='name' name='name' onChange={handleChange} />
                                         </FormControl>
-                                        <FormControl mt={4} isRequired >
-                                            <FormLabel>Permission</FormLabel>
-                                            <Select color={textColor} value={userDetails.permission} name='permission' id='permission' onChange={handleChange} sx={{ option: { color: textColor } }} >
-                                                <option >--Select Permission--</option>
-                                                <option >Admin</option>
-                                                <option >User</option>
-                                            </Select>
-                                        </FormControl>
-                                        <FormControl mt={4} isRequired >
-                                            <FormLabel>Tags</FormLabel>
-                                            <Select color={textColor} value={userDetails.tags} name='tags' id='tags' onChange={handleChange} sx={{ option: { color: textColor } }} >
-                                                <option >--Select Tags--</option>
-                                                <option >VIP</option>
-                                            </Select>
-                                        </FormControl>
-                                        <FormControl mt={4} isRequired>
-                                            <FormLabel>Department</FormLabel>
-                                            <Select color={textColor} value={userDetails.department} name='department' id='department' onChange={handleChange} sx={{ option: { color: textColor } }} >
-                                                <option >--Select Department--</option>
-                                                <option >Department 1</option>
-                                                <option >Department 2</option>
-                                                <option >Department 3</option>
-                                                <option >Department 4</option>
-                                            </Select>
-                                        </FormControl>
+                                        
+                            
                                         {/* <FormControl mt={4}>
                             <FormLabel>Status</FormLabel>
                             <Input color={textColor} value={vendorDetails.status} id='status' name='status' onChange={handleChange} />
