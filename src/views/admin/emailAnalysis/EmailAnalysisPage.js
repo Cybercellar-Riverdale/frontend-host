@@ -457,7 +457,7 @@ function EmailAnalysisPage() {
                         <FormControl mt={2}>
                             <Flex align='center'>
                             <FormLabel width='100px'>Message Body:</FormLabel>
-                                <Textarea value={emailDetails.body} placeholder='Message Body...' rows={6} color={textColor} />
+                                <Textarea readOnly value={emailDetails.body} placeholder='Message Body...' rows={6} color={textColor} />
                             </Flex>
                         </FormControl>
                         {/* <Divider mt={2} /> */}

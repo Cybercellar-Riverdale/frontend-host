@@ -256,11 +256,11 @@ function IncidentAnalysisTabs() {
             Cell: ({ row }) => (
                 <Box>
                     {row.original.status === 'auto remediated' ? (<Badge variant='subtle' backgroundColor='red.200' borderRadius={0} mt={1} maxW="fit-content" color='black' >
-                        {row.original.status}
+                        {row.original.action}
                     </Badge>) : row.original.status === 'quarantined' ? (<Badge variant='subtle' backgroundColor='blue.200' borderRadius={0} mt={1} maxW="fit-content" color='black' >
-                        {row.original.status}
+                        {row.original.action}
                     </Badge>) : (<Badge variant='subtle' backgroundColor='green.200' borderRadius={0} mt={1} maxW="fit-content" color='black' >
-                        {row.original.status}
+                        {row.original.action}
                     </Badge>)
                     }
                 </Box >
