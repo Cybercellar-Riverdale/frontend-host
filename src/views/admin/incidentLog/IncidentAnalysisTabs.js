@@ -1,8 +1,9 @@
 import Card from 'components/card/Card'
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel, useColorModeValue, Table, Thead, Tr, Th, Flex, Tbody, Text, Icon, Td, SimpleGrid, Button, Select, Box, Badge, Link } from '@chakra-ui/react'
 import { useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import QuarantinedBar from './QuarantinedBar';
+import axios from 'axios';
 import QuarantinedPie from './QuarantinedPie';
 import SPFCheckPie from './SPFCheckPie';
 import DKIMCheckPie from './DKIMCheckPie';
@@ -166,10 +167,10 @@ function IncidentAnalysisTabs() {
             Cell: ({ row }) => {
                 const handleSet = () => {
                     localStorage.setItem("email_id", JSON.stringify(row.original));
-                    window.location.href = `#/admin/emailanalysis/${row.original.email_id}`
+                    window.location.href = `#/admin/emailanalysis/${row.original.id}`
                 }
                 return (
-                    <Text onClick={handleSet} cursor='pointer'>{row.original.email_id}</Text>
+                    <Text onClick={handleSet} cursor='pointer'>{row.original.id}</Text>
                 )
             }
         },
@@ -177,8 +178,8 @@ function IncidentAnalysisTabs() {
             Header: "EMAIL",
             accessor: "email",
             Cell: ({ row }) => (
-                <Link href={redirectToEmailPage(row.original.email)} color="blue.500">
-                    {row.original.email}
+                <Link href={redirectToEmailPage(row.original.recipient)} color="blue.500">
+                    {row.original.recipient}
                 </Link>
             )
         },
@@ -188,9 +189,11 @@ function IncidentAnalysisTabs() {
             Cell: ({ row }) => (
                 <Box display="flex" flexDirection="column">
                     <Text fontWeight="600">{row.original.subject}</Text>
+                    {/*}
                     <Badge variant='subtle' backgroundColor={row.original.attackType === 'Malware' ? "red.200" : "blue.200"} borderRadius={0} mt={1} maxW="fit-content" color='black' >
                         Attack Type: {row.original.attackType}
                     </Badge>
+                    */}
                 </Box>
             )
         },
@@ -199,11 +202,12 @@ function IncidentAnalysisTabs() {
             accessor: "from",
             Cell: ({ row }) => (
                 <Box display="flex" flexDirection="column">
-                    <Text fontWeight="600" >{row.original.from}</Text>
-                    <Text fontWeight="100">{row.original.fromEmail}</Text>
-                    <Badge variant='subtle' backgroundColor={row.original.impParty === 'Unknown Partner' ? "red.200" : "blue.200"} borderRadius={0} mt={1} maxW="fit-content" color='black' >
+                    <Text fontWeight="600" >{row.original.senderName}</Text>
+                    <Text fontWeight="100">{row.original.senderEmail}</Text>
+                    
+                    {/* <Badge variant='subtle' backgroundColor={row.original.impParty === 'Unknown Partner' ? "red.200" : "blue.200"} borderRadius={0} mt={1} maxW="fit-content" color='black' >
                         Impersonated Party: {row.original.impParty}
-                    </Badge>
+                    </Badge> */}
                 </Box>
             )
         },
@@ -212,8 +216,8 @@ function IncidentAnalysisTabs() {
             accessor: "campaign_recipient",
             Cell: ({ row }) => (
                 <Box display="flex" flexDirection="column">
-                    <Text fontWeight="600" >{row.original.campaign_recipient}</Text>
-                    <Text fontWeight="100">{row.original.campReciepEmail}</Text>
+                    {/* <Text fontWeight="600" >{row.original.campaign_recipient}</Text> */}
+                    <Text fontWeight="100">{row.original.recipient}</Text>
                 </Box>
             )
         },
@@ -222,8 +226,8 @@ function IncidentAnalysisTabs() {
             accessor: "received",
             Cell: ({ row }) => (
                 <Box display="flex" flexDirection="column">
-                    <Text fontWeight="600" w="100px" >{row.original.received}</Text>
-                    <Text fontWeight="100" w="160px">{row.original.receivedDate}</Text>
+                    {/* <Text fontWeight="600" w="100px" >{row.original.received}</Text> */}
+                    <Text fontWeight="100" w="160px">{row.original.date}</Text>
                 </Box>
             )
         },
@@ -232,16 +236,17 @@ function IncidentAnalysisTabs() {
             accessor: "topic",
             Cell: ({ row }) => (
                 <Box display="flex" flexDirection="column">
-                    {row.original.topic !== '' ? (<Badge variant='subtle' backgroundColor='blue.200' borderRadius={0} mt={1} maxW="fit-content" color='black' >
+                    {/* {row.original.topic !== '' ? (<Badge variant='subtle' backgroundColor='blue.200' borderRadius={0} mt={1} maxW="fit-content" color='black' >
                         Topic: {row.original.topic}
-                    </Badge>) : null}
+                    </Badge>) : null} */}
 
                     <Badge variant='subtle' backgroundColor={row.original.attack_strat === 'Unknown Sender' ? "red.200" : "blue.200"} borderRadius={0} mt={1} maxW="fit-content" color='black' >
-                        Attack Strategy: {row.original.attack_strat}
+                        Attack Strategy: {row.original.emailCategory}
                     </Badge>
-                    <Badge variant='subtle' backgroundColor='blue.200' borderRadius={0} mt={1} maxW="fit-content" color='black' >
+                    
+                    {/* <Badge variant='subtle' backgroundColor='blue.200' borderRadius={0} mt={1} maxW="fit-content" color='black' >
                         Attack Vector: {row.original.attack_vector}
-                    </Badge>
+                    </Badge> */}
                 </Box>
             )
         },
@@ -251,11 +256,11 @@ function IncidentAnalysisTabs() {
             Cell: ({ row }) => (
                 <Box>
                     {row.original.status === 'auto remediated' ? (<Badge variant='subtle' backgroundColor='red.200' borderRadius={0} mt={1} maxW="fit-content" color='black' >
-                        AUTO REMEDIATED
+                        {row.original.status}
                     </Badge>) : row.original.status === 'quarantined' ? (<Badge variant='subtle' backgroundColor='blue.200' borderRadius={0} mt={1} maxW="fit-content" color='black' >
-                        QUARANTINED
+                        {row.original.status}
                     </Badge>) : (<Badge variant='subtle' backgroundColor='green.200' borderRadius={0} mt={1} maxW="fit-content" color='black' >
-                        SENT
+                        {row.original.status}
                     </Badge>)
                     }
                 </Box >
@@ -264,8 +269,45 @@ function IncidentAnalysisTabs() {
     ], []);
 
 
+    const [spfCount, setSpfCount] = useState({});
+    const [data, setData] = useState([]);
 
-    const data = useMemo(() => [
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/incident/get-mailbox'); 
+                console.log("FETCHED DATA: ", response);
+                setData(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+
+    useEffect(() => {
+        if (data.length>0) {
+            console.log("Data has been set");
+        }
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/incident/get-spf-count'); 
+                console.log("FETCHED DATA: ", response);
+                setSpfCount(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, [data]);
+
+    /*
+
+   const data = useMemo(() => [
         {
             "email_id": "1001",
             "email": "tylerfinky@gmail.com",
@@ -400,6 +442,9 @@ function IncidentAnalysisTabs() {
         }
     ], []);
 
+    */
+
+
     const textColor = useColorModeValue("secondaryGray.900", "white");
     const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
     return (
@@ -432,7 +477,7 @@ function IncidentAnalysisTabs() {
                                 </SimpleGrid>
                                 <Text fontSize='26px' fontWeight='700'>Email Authentication Analysis</Text>
                                 <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
-                                    <SPFCheckPie />
+                                    <SPFCheckPie spfCount={spfCount} />
                                     {/* <QuarantinedBar /> */}
                                     <DKIMCheckPie />
                                     {/* <QuarantinedPie /> */}

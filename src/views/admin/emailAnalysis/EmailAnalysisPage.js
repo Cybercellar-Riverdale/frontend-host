@@ -37,8 +37,8 @@ function EmailAnalysisPage() {
 
     const data = React.useMemo(() => [
         {
-            "attack_score": emailDetails.attack_score || '',
-            "attackType": emailDetails.attackType || '',
+            "attack_score": emailDetails.emailSeverityScore,
+            "attackType": emailDetails.emailCategory==="clean"? 'Nil': emailDetails.emailCategory,
             "attactTags": "", // Placeholder for other data you might want to display
         }
     ], [emailDetails]);

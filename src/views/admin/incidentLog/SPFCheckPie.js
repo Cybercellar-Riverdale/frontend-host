@@ -8,8 +8,19 @@ import { VSeparator } from "components/separator/Separator";
 import React from "react";
 
 export default function SPFCheckPie(props) {
-    const { status, ...rest } = props;
+    const { spfCount, ...rest } = props;
     const pieChartDataSPFCheck = [31, 33, 36];
+    const spfLabels = [null, true, false];
+
+    console.log("SPF COUNT", spfCount);
+
+    //const countArr = spfLabels.map(label => spfCount[String(label)]);
+
+    const countArr = Object.values(spfCount);
+
+    const total = countArr.reduce((acc, value) => acc + value, 0);
+    
+    const percentages = countArr.map(value => Math.ceil((value / total) * 100));
 
     const pieChartOptionsSPFCheck = {
         labels: ["Missing", "Pass", "Fail",],
@@ -91,12 +102,16 @@ export default function SPFCheckPie(props) {
         </Select> */}
             </Flex>
 
-            <PieChart
+            {countArr.length === 3 && (
+                <PieChart
                 h='100%'
                 w='100%'
-                chartData={pieChartDataSPFCheck}
+                chartData={percentages}
                 chartOptions={pieChartOptionsSPFCheck}
-            />
+                />
+            )}
+
+            
              <Card
                 bg={cardColor}
                 flexDirection='row'

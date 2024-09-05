@@ -302,11 +302,12 @@ function MailboxMonitoringTabs() {
         setMonths(monthTally);
       };
 
+      
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:8080/incident/get-mailbox'); // Replace with your actual API endpoint
-                console.log("FETCHED DATA: ", response.data);
+                console.log("FETCHED DATA: ", response);
                 setData(response.data);
                 setLoading(false);
             } catch (error) {
