@@ -306,7 +306,9 @@ function MailboxMonitoringTabs() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/incident/get-mailbox'); // Replace with your actual API endpoint
+                const response = await axios.get('http://localhost:8080/incident/get-mailbox', {
+                    withCredentials: true, // Ensures the cookie is included in the request
+                }); // Replace with your actual API endpoint
                 console.log("FETCHED DATA: ", response);
                 setData(response.data);
                 setLoading(false);

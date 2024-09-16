@@ -276,7 +276,9 @@ function IncidentAnalysisTabs() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/incident/get-mailbox'); 
+                const response = await axios.get('http://localhost:8080/incident/get-mailbox', {
+                    withCredentials: true, // Ensures the cookie is included in the request
+                }); 
                 console.log("FETCHED DATA: ", response);
                 setData(response.data);
             } catch (error) {
@@ -294,7 +296,9 @@ function IncidentAnalysisTabs() {
         }
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/incident/get-spf-count'); 
+                const response = await axios.get('http://localhost:8080/incident/get-spf-count', {
+                    withCredentials: true
+                }); 
                 console.log("FETCHED DATA: ", response);
                 setSpfCount(response.data);
             } catch (error) {

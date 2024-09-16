@@ -18,6 +18,11 @@ class AuthService {
     return await HttpService.post(addUserEndpoint, data);
   }
 
+  addVendor = async(data) => {
+    const addVendorEndpoint = 'addVendor';
+    return await HttpService.post(addVendorEndpoint, data);
+  }
+
   logout = async () => {
     const logoutEndpoint = 'logout';
     return await HttpService.post(logoutEndpoint);

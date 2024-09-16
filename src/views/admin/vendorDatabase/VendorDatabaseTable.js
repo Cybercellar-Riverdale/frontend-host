@@ -1,5 +1,5 @@
 import Card from 'components/card/Card'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel, useColorModeValue, Table, Thead, Tr, Th, Flex, Tbody, Text, Icon, Td, SimpleGrid, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, FormControl, FormLabel, Input, Select, Button, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Switch, useColorMode, Badge, } from '@chakra-ui/react'
 import { useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import { MdAdd } from 'react-icons/md';
@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'
 import EditVendor from './EditVendor';
 import DeleteVendor from './DeleteVendor';
+import axios from 'axios';
+import AuthService from 'services/auth-service';
 
 export function VendorDatabase({ columns, data }) {
     const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -164,7 +166,7 @@ function VendorDatabaseTable() {
     const columns = useMemo(() => [
         {
             Header: "VENDOR EMAIL",
-            accessor: "vendoremail",
+            accessor: "email",
         },
         {
             Header: "NAME",
@@ -209,98 +211,124 @@ function VendorDatabaseTable() {
         // },
 
     ], []);
-    const data = useMemo(() => [
-        {
-            "vendoremail": "abc@gmail.com",
-            "name": "Abc",
-            "status": "Active"
-        },
-        {
-            "vendoremail": "def@gmail.com",
-            "name": "Def",
-            "status": "Active"
-        },
-        {
-            "vendoremail": "ghi@gmail.com",
-            "name": "Ghi",
-            "status": "Inactive"
-        },
-        {
-            "vendoremail": "jkl@gmail.com",
-            "name": "Jkl",
-            "status": "Active"
-        },
-        {
-            "vendoremail": "mno@gmail.com",
-            "name": "Mno",
-            "status": "Inactive"
-        },
-        {
-            "vendoremail": "pqr@gmail.com",
-            "name": "Pqr",
-            "status": "Inactive"
-        },
-        {
-            "vendoremail": "stu@gmail.com",
-            "name": "Stu",
-            "status": "Active"
-        },
-        {
-            "vendoremail": "vwx@gmail.com",
-            "name": "Vwx",
-            "status": "Inactive"
-        },
-        {
-            "vendoremail": "yz@gmail.com",
-            "name": "Yz",
-            "status": "Active"
-        },
-        {
-            "vendoremail": "abc@gmail.com",
-            "name": "Abc",
-            "status": "Active"
-        },
-        {
-            "vendoremail": "def@gmail.com",
-            "name": "Def",
-            "status": "Active"
-        },
-        {
-            "vendoremail": "ghi@gmail.com",
-            "name": "Ghi",
-            "status": "Inactive"
-        },
-        {
-            "vendoremail": "jkl@gmail.com",
-            "name": "Jkl",
-            "status": "Active"
-        },
-        {
-            "vendoremail": "mno@gmail.com",
-            "name": "Mno",
-            "status": "Inactive"
-        },
-        {
-            "vendoremail": "pqr@gmail.com",
-            "name": "Pqr",
-            "status": "Inactive"
-        },
-        {
-            "vendoremail": "stu@gmail.com",
-            "name": "Stu",
-            "status": "Active"
-        },
-        {
-            "vendoremail": "vwx@gmail.com",
-            "name": "Vwx",
-            "status": "Inactive"
-        },
-        {
-            "vendoremail": "yz@gmail.com",
-            "name": "Yz",
-            "status": "Active"
+
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        if (data.length>0) {
+            console.log("Data has been set");
         }
-    ], []);
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/incident/get-vendors', {
+                    withCredentials: true
+                }); 
+                console.log("FETCHED VENDOR DATA: ", response);
+                setData(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        console.log("Second UseEffect");
+    }, [data]);
+
+    // const data = useMemo(() => [
+    //     {
+    //         "vendoremail": "abc@gmail.com",
+    //         "name": "Abc",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "vendoremail": "def@gmail.com",
+    //         "name": "Def",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "vendoremail": "ghi@gmail.com",
+    //         "name": "Ghi",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "vendoremail": "jkl@gmail.com",
+    //         "name": "Jkl",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "vendoremail": "mno@gmail.com",
+    //         "name": "Mno",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "vendoremail": "pqr@gmail.com",
+    //         "name": "Pqr",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "vendoremail": "stu@gmail.com",
+    //         "name": "Stu",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "vendoremail": "vwx@gmail.com",
+    //         "name": "Vwx",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "vendoremail": "yz@gmail.com",
+    //         "name": "Yz",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "vendoremail": "abc@gmail.com",
+    //         "name": "Abc",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "vendoremail": "def@gmail.com",
+    //         "name": "Def",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "vendoremail": "ghi@gmail.com",
+    //         "name": "Ghi",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "vendoremail": "jkl@gmail.com",
+    //         "name": "Jkl",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "vendoremail": "mno@gmail.com",
+    //         "name": "Mno",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "vendoremail": "pqr@gmail.com",
+    //         "name": "Pqr",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "vendoremail": "stu@gmail.com",
+    //         "name": "Stu",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "vendoremail": "vwx@gmail.com",
+    //         "name": "Vwx",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "vendoremail": "yz@gmail.com",
+    //         "name": "Yz",
+    //         "status": "Active"
+    //     }
+    // ], []);
 
     const textColor = useColorModeValue("secondaryGray.900", "white");
     const optionColor = useColorModeValue('gray.800', 'gray.200');
@@ -357,13 +385,13 @@ function VendorDatabaseTable() {
         "name": '',
     }
     const [vendorDetails, setVendorDetails] = useState(initialValues);
-    const [active, setActive] = useState('');
+    const [active, setActive] = useState('Inactive');
 
     const handleChange = (e) => {
         setVendorDetails({ ...vendorDetails, [e.target.name]: e.target.value });
     }
 
-    const handleEditSave = () => {
+    const handleEditSave = async () => {
         if (!vendorDetails.vendoremail) {
             toast.error('Please enter a vendor email', {
                 position: toast.POSITION.TOP_CENTER,
@@ -379,12 +407,37 @@ function VendorDatabaseTable() {
             );
         }
         else {
+
             console.log("Edited:", vendorDetails);
             console.log("Active:", active);
+
+            const newVendor = { name: vendorDetails.name, email: vendorDetails.vendoremail, status: active };
+            const myData = {
+                data: {
+                type: "vendors",
+                attributes: { ...newVendor },
+                relationships: {
+                    roles: {
+                    data: [
+                        {
+                        type: "roles",
+                        id: "1",
+                        },
+                    ],
+                    },
+                },
+                },
+            };
+
+            console.log("My data: ", myData);
+            const authService = new AuthService();
+            const response = await authService.addVendor(myData);
+            console.log("Vendor creation: ", response);
+
             toast.success('Vendor Created Successfully', {
                 position: toast.POSITION.TOP_CENTER,
                 theme: colorMode,
-            })
+            });
             setVendorDetails(initialValues);
             onClose();
         }

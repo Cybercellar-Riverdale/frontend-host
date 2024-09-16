@@ -362,8 +362,7 @@ function EmailAnalysisPage() {
                         <Tab>IP Check</Tab>
                         <Tab>Domain Analysis</Tab>
                         <Tab>Link Analysis</Tab>
-                        <Tab>File Analysis</Tab>
-                        <Tab>QR Code Analysis</Tab>
+                        <Tab>File Analysis</Tab>                        
                     </TabList>
                     <TabPanels>
                         <TabPanel>
@@ -420,6 +419,18 @@ function EmailAnalysisPage() {
                         <TabPanel>
                         <Textarea
                                 value={JSON.stringify(emailDetails.analysisArray, null, 2)}
+                                readOnly
+                                width="100%"
+                                height="400px"
+                                fontFamily="monospace"
+                                bgColor="gray.100"
+                                color="black"
+                                p={4}
+                            />
+                        </TabPanel>
+                        <TabPanel>
+                        <Textarea
+                                value={JSON.stringify(emailDetails.fileAnalysis, null, 2)}
                                 readOnly
                                 width="100%"
                                 height="400px"

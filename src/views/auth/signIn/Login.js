@@ -182,10 +182,10 @@ function Login() {
       // }
       // );
       console.log(err)
-      if(err.errors)
-      {
-        setError(err.errors[0].detail)
-      }
+      // if(err.errors)
+      // {
+      //   setError(err.errors[0].detail)
+      // }
       console.log(err)
     }
   }
