@@ -8,12 +8,21 @@ import { VSeparator } from "components/separator/Separator";
 import React from "react";
 
 export default function RealTimeThreatPie(props) {
-    const { ...rest } = props;
+    const { threatSeverity, ...rest } = props;
 
-    const pieChartDataDistributionThreat = [10, 18, 37, 35];
+    // Get keys
+    const keys = Object.keys(threatSeverity);
+
+    // Get values
+    const values = Object.values(threatSeverity);
+
+    console.log(keys);   // ['low', 'medium', 'high', 'critical']
+    console.log(values); // [698, 0, 0, 0]
+
+    const pieChartDataDistributionThreat = values;
 
     const pieChartOptionsDistributionThreat = {
-        labels: ["Critical", "Low", "Medium", "High",],
+        labels: ["Low", "Medium", "High", "Critical"],
         colors: ["#FFCC99", "#99FF99", "#66B3FF", "#FF9999"],
         chart: {
             width: "50px",

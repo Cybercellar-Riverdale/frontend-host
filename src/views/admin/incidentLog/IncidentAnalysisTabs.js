@@ -459,14 +459,15 @@ function IncidentAnalysisTabs() {
                 <Tabs >
                     <TabList>
                         <Tab _focus={{ boxShadow: "none" }}>Incidents</Tab>
-                        <Tab _focus={{ boxShadow: "none" }}>Analysis Reports</Tab>
+                        {/* <Tab _focus={{ boxShadow: "none" }}>Analysis Reports</Tab> */}
                     </TabList>
 
                     <TabPanels>
                         <TabPanel>
                             <IncidentTable columns={columns} data={data} />
                         </TabPanel>
-                        <TabPanel>
+                        
+                        {/* <TabPanel>
                             <Card
                                 direction='column'
                                 w='100%'
@@ -482,9 +483,9 @@ function IncidentAnalysisTabs() {
                                 <Text fontSize='26px' fontWeight='700'>Email Authentication Analysis</Text>
                                 <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
                                     <SPFCheckPie spfCount={spfCount} />
-                                    {/* <QuarantinedBar /> */}
+                                     <QuarantinedBar />
                                     <DKIMCheckPie />
-                                    {/* <QuarantinedPie /> */}
+                                     <QuarantinedPie /> 
                                 </SimpleGrid>
                                 <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
                                     <DMARCCheckPie />
@@ -494,8 +495,7 @@ function IncidentAnalysisTabs() {
                                 <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
                                     <BlockEmailsLine />
                                     <BlockedEmailsBar />
-                                </SimpleGrid>
-                                {/*
+                                </SimpleGrid>                                
                                 <Text fontSize='26px' fontWeight='700'>Sandboxing Results</Text>
                                 <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
                                     <EmailStatusSandBoxPie />
@@ -505,9 +505,10 @@ function IncidentAnalysisTabs() {
                                     <DetectedByClientBar />
                                     <ThreatsFromDomainBar />
                                 </SimpleGrid>
-                                */}
+                                
                             </Card>
-                        </TabPanel>
+                        </TabPanel> */}
+
                     </TabPanels>
                 </Tabs>
             </Card>

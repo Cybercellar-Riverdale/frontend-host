@@ -1,26 +1,3 @@
-/*!
-  _   _  ___  ____  ___ ________  _   _   _   _ ___   
- | | | |/ _ \|  _ \|_ _|__  / _ \| \ | | | | | |_ _| 
- | |_| | | | | |_) || |  / / | | |  \| | | | | || | 
- |  _  | |_| |  _ < | | / /| |_| | |\  | | |_| || |
- |_| |_|\___/|_| \_\___/____\___/|_| \_|  \___/|___|
-                                                                                                                                                                                                                                                                                                                                       
-=========================================================
-* Horizon UI - v1.1.0
-=========================================================
-
-* Product Page: https://www.horizon-ui.com/
-* Copyright 2022 Horizon UI (https://www.horizon-ui.com/)
-
-* Designed and Coded by Simmmple
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-// Chakra imports
 import {
   Avatar,
   Box,
@@ -39,7 +16,7 @@ import Usa from "assets/img/dashboards/usa.png";
 import MiniCalendar from "components/calendar/MiniCalendar";
 import MiniStatistics from "components/card/MiniStatistics";
 import IconBox from "components/icons/IconBox";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   MdAddTask,
   MdAttachEmail,
@@ -49,6 +26,7 @@ import {
   MdPeople,
   MdPerson,
 } from "react-icons/md";
+import axios from "axios";
 import CheckTable from "views/admin/default/components/CheckTable";
 import ComplexTable from "views/admin/default/components/ComplexTable";
 import DailyTraffic from "views/admin/default/components/DailyTraffic";
@@ -73,12 +51,162 @@ import TrafficBreakDownDonut from "./components/TrafficBreakDownDonut";
 import ThreatTrendsArea from "./components/ThreatTrendsArea";
 import ThreatTrendsBar from "./components/ThreatTrendsBar";
 import { ToastContainer } from "react-toastify";
+import TrafficBreakDonut from "../mailboxMonitoring/TrafficBreakDonut";
 // import TrafficBreakBar from "./components/TrafficBreakPie";
 
 export default function UserReports() {
   // Chakra Color Mode
   const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+
+  const [data, setData] = useState([]);
+  const [email_no, set_email_no] = useState(0);
+  const [vendors_no, set_vendors_no] = useState('0');
+  const [users_no, set_users_no] = useState('0');
+
+  const [emailTraffic, setEmailTraffic] = useState(null);
+
+  const [threatSeverity, setThreatSeverity] = useState(null);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/incident/get-mailbox', {
+                withCredentials: true, // Ensures the cookie is included in the request
+            }); // Replace with your actual API endpoint
+            console.log("FETCHED DATA: ", response);
+            setData(response.data);
+            
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            
+        }
+    };
+
+    fetchData();
+}, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/incident/get-mailbox', {
+                withCredentials: true, // Ensures the cookie is included in the request
+            }); // Replace with your actual API endpoint
+            console.log("FETCHED DATA: ", response);
+            set_email_no(response.data.length.toString());
+            
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            
+        }
+    };
+
+    fetchData();
+}, []);
+
+
+
+
+useEffect(() => {
+  const fetchData = async () => {
+      try {
+          const response = await axios.get('http://localhost:8080/incident/get-vendors', {
+              withCredentials: true, // Ensures the cookie is included in the request
+          }); // Replace with your actual API endpoint
+          console.log("FETCHED DATA: ", response);
+          set_vendors_no(response.data.length.toString());
+          
+      } catch (error) {
+          console.error('Error fetching data:', error);
+          
+      }
+  };
+
+  fetchData();
+}, []);
+
+
+useEffect(() => {
+  const fetchData = async () => {
+      try {
+          const response = await axios.get('http://localhost:8080/incident/get-protected-users', {
+              withCredentials: true, // Ensures the cookie is included in the request
+          }); // Replace with your actual API endpoint
+          console.log("FETCHED USERS DATA: ", response);
+          set_users_no(response.data.length.toString());
+          
+      } catch (error) {
+          console.error('Error fetching data:', error);
+          
+      }
+  };
+
+  fetchData();
+}, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/incident/get-threat-severity', {
+                withCredentials: true, // Ensures the cookie is included in the request
+            }); // Replace with your actual API endpoint
+            console.log("FETCHED THREAT SEVERITY: ", response);
+            setThreatSeverity(response.data);
+            
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            
+        }
+    };
+
+    fetchData();
+  }, []);
+
+  const tallyEmailCategories = async (arrayOfObjects) => {
+    const emailCategories = {
+        clean: 0,
+        phishing: 0,
+        malicious: 0,
+        unrated: 0
+    };
+
+    arrayOfObjects.forEach(obj => {
+        const { emailCategory } = obj;
+        if (emailCategories[emailCategory] != undefined ) {
+            emailCategories[emailCategory]++;
+        }
+    });
+
+    setEmailTraffic(emailCategories);
+  };
+
+  const tallyThreatSeverity = async (arrayOfObjects) => {
+    const threatSeverity = {
+        low: 0,
+        medium: 0,
+        high: 0,
+        critical: 0
+    };
+
+    arrayOfObjects.forEach(obj => {
+        const { threatCategory } = obj;
+        if (threatSeverity[threatCategory] != undefined ) {
+            threatSeverity[threatCategory]++;
+        }
+    });
+
+    setThreatSeverity(threatSeverity);
+  };
+
+useEffect(() => {
+  if (data.length > 0) {
+    tallyEmailCategories(data);
+  }
+}, [data]);
+
+
+
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }} >
       <Text fontSize="35px" fontWeight="600" >Dashboard</Text>
@@ -98,7 +226,7 @@ export default function UserReports() {
             />
           }
           name='Total users account connected'
-          value='2500'
+          value={users_no}
         />
         <MiniStatistics
           startContent={
@@ -112,7 +240,7 @@ export default function UserReports() {
             />
           }
           name='Email Received'
-          value='3259'
+          value={email_no}
         />
         <MiniStatistics
           startContent={
@@ -140,7 +268,7 @@ export default function UserReports() {
             />
           }
           name='Vendors connected'
-          value='348'
+          value={vendors_no}
         />
       </SimpleGrid>
 
@@ -148,7 +276,7 @@ export default function UserReports() {
 
       <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
         <RealTimeThreatBar />
-        <RealTimeThreatPie />
+        {threatSeverity && <RealTimeThreatPie threatSeverity={threatSeverity} />}
         {/* <TotalSpent /> */}
         {/* <DailyTraffic /> */}
         {/* <WeeklyRevenue /> */}
@@ -167,7 +295,7 @@ export default function UserReports() {
       </SimpleGrid>
       <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
         <ThreatTypeBreakPie />
-        <TrafficBreakDownDonut />
+        {emailTraffic && <TrafficBreakDownDonut emailTraffic={emailTraffic} />}
         {/* <ThreatsDetectedLine /> */}
         {/* <TotalSpent /> */}
         {/* <DailyTraffic /> */}

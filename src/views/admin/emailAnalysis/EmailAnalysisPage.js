@@ -1,4 +1,4 @@
-import { Button, Flex, FormControl, FormLabel, Input, SimpleGrid, Table, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue, Tabs, TabList, TabPanels, Tab, TabPanel, Textarea, useDisclosure, Modal, ModalOverlay, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, ModalContent, Divider, Select, } from '@chakra-ui/react';
+import { Box, Button, Flex, FormControl, FormLabel, Input, SimpleGrid, Table, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue, Tabs, TabList, TabPanels, Tab, TabPanel, Textarea, useDisclosure, Modal, ModalOverlay, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, ModalContent, Divider, Select, } from '@chakra-ui/react';
 import Card from 'components/card/Card';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -18,6 +18,8 @@ function EmailAnalysisPage() {
 
     const { isOpen: isRemediationOpen, onOpen: onRemediationOpen, onClose: onRemediationClose } = useDisclosure();
     const { isOpen: isGaugeChartOpen, onOpen: onGaugeChartOpen, onClose: onGaugeChartClose } = useDisclosure();
+    const { isOpen: isDomainAnalysisOpen, onOpen: onDomainAnalysisOpen, onClose: onDomainAnalysisClose } = useDisclosure();
+    const { isOpen: isLinkAnalysisOpen, onOpen: onLinkAnalysisOpen, onClose: onLinkAnalysisClose } = useDisclosure();
 
     // Load email details from local storage or state
     useEffect(() => {
@@ -90,6 +92,12 @@ function EmailAnalysisPage() {
     let no_of_vendors = 0;
     let malicious_stats = 0;
     let ipCountry = null;
+    let domainAnalysisUrl = null;
+    let domainAnalysisCategory = null;
+    let domainAnalysisStats = null;
+
+    let linkAnalysisStats = null;
+    let linkAnalysisUrls = [];
     
     if (emailDetails && emailDetails.ipAnalysis && emailDetails.ipAnalysis.data.id && emailDetails.ipAnalysis.data && emailDetails.ipAnalysis.data.attributes && emailDetails.ipAnalysis.data.attributes.last_analysis_stats && emailDetails.ipAnalysis.data.attributes.country) {
         ipAnalysisStats = emailDetails.ipAnalysis.data.attributes.last_analysis_stats;
@@ -103,6 +111,25 @@ function EmailAnalysisPage() {
         console.log("ipAnalysis or necessary fields are missing in emailDetails");
     }
 
+    if (emailDetails && emailDetails.domainAnalysis[0]["url"] && emailDetails.domainAnalysis[0]["category"] && emailDetails.domainAnalysis[0]) {
+        domainAnalysisCategory = emailDetails.domainAnalysis[0]["category"];
+        domainAnalysisUrl = emailDetails.domainAnalysis[0]["url"];
+        domainAnalysisStats = emailDetails.domainAnalysis[0];
+    }
+
+    if(emailDetails && emailDetails.analysisArray) {
+        linkAnalysisStats = emailDetails.analysisArray;
+        let no_of_urls = emailDetails.analysisArray.length;
+        for (let i = 0; i<no_of_urls; i++) {
+            if (emailDetails.analysisArray[i]["url"]) {
+                linkAnalysisUrls.push(emailDetails.analysisArray[i]["url"]);            
+            } else {
+                console.log("Missing url");
+            }
+        }
+
+    }
+
     const handleQuarantine = async() => {
         try {
             const authService = new AuthService();
@@ -112,6 +139,17 @@ function EmailAnalysisPage() {
             window.location.href = "/admin/mailboxmonitoring";
         } catch (error) {
             console.log("Quarantine Handler Error: ", error);
+        }
+    }
+
+    const handleLinkAnalysisClick = async(url) => {
+        try {
+            const parsedUrl = new URL(url);  // Parse the URL
+            const domain_name = parsedUrl.hostname;
+            console.log(domain_name); 
+            window.open(`https://www.virustotal.com/gui/search/${domain_name}`, "_blank");
+        } catch (error) {
+            
         }
     }
 
@@ -365,15 +403,15 @@ function EmailAnalysisPage() {
                         <Tab>File Analysis</Tab>                        
                     </TabList>
                     <TabPanels>
-                        <TabPanel>
-                            <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb='20px'>
-                                {/*<SPFCheckPie status={emailDetails.spf}/>*/}
-                                <SPFResult status={emailDetails.spf} />
-                                <DKIMCheckPie />
-                            </SimpleGrid>
-                            <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb='5px'>
-                                <DMARCCheckPie />
-                            </SimpleGrid>
+                        <TabPanel>            
+                                <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb='20px' mx='auto' alignContent='center'>
+                                    {/*<SPFCheckPie status={emailDetails.spf}/>*/}
+                                    <SPFResult status={emailDetails.spf} />
+                                    {/* <DKIMCheckPie /> */}
+                                </SimpleGrid>
+                                {/* <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb='5px'>
+                                    <DMARCCheckPie />
+                                </SimpleGrid> */}
                         </TabPanel>
                         <TabPanel>
                         <GaugeChart value={malicious_stats} total={no_of_vendors} onClick={onGaugeChartOpen}/>
@@ -388,45 +426,79 @@ function EmailAnalysisPage() {
                                 </ModalBody>
                                 </ModalContent>
                             </Modal>
-                        {/*
-                        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb='20px'>
-                                <GaugeChart value={malicious_stats} total={no_of_vendors} />    
-                                <Textarea
-                                value={JSON.stringify(emailDetails.ipAnalysis, null, 1)}
-                                readOnly
-                                width="100%"
-                                height="400px"
-                                fontFamily="monospace"
-                                bgColor="gray.100"
-                                color="black"
-                                p={4}
-                        />
-                        </SimpleGrid>
-                        */}
                         </TabPanel>
                         <TabPanel>
-                        <Textarea
-                                value={JSON.stringify(emailDetails.domainAnalysis, null, 2)}
-                                readOnly
+                            <Box
                                 width="100%"
                                 height="400px"
                                 fontFamily="monospace"
-                                bgColor="gray.100"
-                                color="black"
+                                color="white"
                                 p={4}
-                            />
+                                overflow="auto"
+                                whiteSpace="pre-wrap"
+                            >
+                                Domain: {JSON.stringify(domainAnalysisUrl, null, 2)}
+                                <br />
+                                Domain Classification: {JSON.stringify(domainAnalysisCategory, null, 2)}
+                                <br />
+                                {/* Clickable part for analysis details */}
+                                <Text as="span" color="blue.500" cursor="pointer" onClick={() => window.open(`https://www.virustotal.com/gui/search/${domainAnalysisUrl}`, "_blank")}>
+                                (Click for analysis details)
+                                </Text>
+                            </Box>
+
+                            {/* Modal for domain analysis */}
+                            <Modal isOpen={isDomainAnalysisOpen} onClose={onDomainAnalysisClose}>
+                                <ModalOverlay />
+                                <ModalContent maxW="400px">
+                                <ModalHeader></ModalHeader>
+                                <ModalCloseButton />
+                                <ModalBody mt={4}>
+                                    <Textarea
+                                    value={`${JSON.stringify(domainAnalysisStats, null, 2)} \n`}
+                                    readOnly
+                                    width="400px"
+                                    height="400px"
+                                    />
+                                </ModalBody>
+                                </ModalContent>
+                            </Modal>
                         </TabPanel>
+
                         <TabPanel>
-                        <Textarea
-                                value={JSON.stringify(emailDetails.analysisArray, null, 2)}
-                                readOnly
+                            <Box
                                 width="100%"
                                 height="400px"
                                 fontFamily="monospace"
-                                bgColor="gray.100"
-                                color="black"
+                                color="white"
                                 p={4}
-                            />
+                                overflow="auto"
+                                whiteSpace="pre-wrap"
+                            >
+                                {linkAnalysisUrls.map((url, index) => (
+                                    <Box key={index}>
+                                        <Text as="span" color="blue.500" cursor="pointer" onClick={() => {handleLinkAnalysisClick(url)}}>
+                                            {url}
+                                        </Text>
+                                        <br />
+                                    </Box>
+                                ))} 
+                            </Box>
+                            <Modal isOpen={isLinkAnalysisOpen} onClose={onLinkAnalysisClose}>
+                                <ModalOverlay />
+                                <ModalContent maxW="400px">
+                                <ModalHeader></ModalHeader>
+                                <ModalCloseButton />
+                                <ModalBody mt={4}>
+                                    <Textarea
+                                    value={`${JSON.stringify(linkAnalysisStats, null, 2)} \n`}
+                                    readOnly
+                                    width="400px"
+                                    height="400px"
+                                    />
+                                </ModalBody>
+                                </ModalContent>
+                            </Modal>                        
                         </TabPanel>
                         <TabPanel>
                         <Textarea

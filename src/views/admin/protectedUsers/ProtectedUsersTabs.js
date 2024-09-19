@@ -1,7 +1,8 @@
 import Card from 'components/card/Card'
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel, useColorModeValue, Table, Thead, Tr, Th, Flex, Tbody, Text, Icon, Td, SimpleGrid, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Box, FormControl, FormLabel, Input, Select, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Switch, useDisclosure, useColorMode, Badge, } from '@chakra-ui/react'
 import { useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
+import axios from 'axios';
 import { MdAdd } from 'react-icons/md';
 import UserRiskScoreBar from './UserRiskScoreBar';
 import UserRiskProfile from './UserRiskProfile';
@@ -171,7 +172,7 @@ function ProtectedUsersTabs() {
     const columns = useMemo(() => [
         {
             Header: "EMPLOYEE ID",
-            accessor: "empid",
+            accessor: "emp_id",
         },
         {
             Header: "USERNAME",
@@ -222,168 +223,197 @@ function ProtectedUsersTabs() {
         // },
 
     ], []);
-    const data = useMemo(() => [
-        {
-            "empid": "EMP1001",
-            "username": "Richard E. Skalski",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 1",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP1002",
-            "username": "Donald M. Dillard",
-            "permissions": "Admin",
-            "tags": "VIP",
-            "department": "Department 2",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP1003",
-            "username": "Tyler C. Rodriguez",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 3",
-            "status": "Inactive"
-        },
-        {
-            "empid": "EMP1004",
-            "username": "Roy D. Barron",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 1",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP1005",
-            "username": "Anthony S. Hernandez",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 4",
-            "status": "Inactive"
-        },
-        {
-            "empid": "EMP1006",
-            "username": "Calvin E. Cuevas",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 2",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP1007",
-            "username": "Jimmy A. McGuire",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 3",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP1008",
-            "username": "Thomas M. Gadson",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 2",
-            "status": "Inactive"
-        },
-        {
-            "empid": "EMP1009",
-            "username": "Fred S. Cousins",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 4",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP10010",
-            "username": "Russell A. Pearson",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 2",
-            "status": "Inactive"
-        },
-        {
-            "empid": "EMP1011",
-            "username": "Fred S. Cousins",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 1",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP1012",
-            "username": "Thomas M. Gadson",
-            "permissions": "Admin",
-            "tags": "VIP",
-            "department": "Department 2",
-            "status": "Inactive"
-        },
-        {
-            "empid": "EMP1013",
-            "username": "Jimmy A. McGuire",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 3",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP1014",
-            "username": "Calvin E. Cuevas",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 1",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP1015",
-            "username": "Anthony S. Hernandez",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 4",
-            "status": "Inactive"
-        },
-        {
-            "empid": "EMP1016",
-            "username": "Roy D. Barron",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 2",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP1017",
-            "username": "Jimmy A. McGuire",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 3",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP1018",
-            "username": "Tyler C. Rodriguez",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 2",
-            "status": "Inactive"
-        },
-        {
-            "empid": "EMP1019",
-            "username": "Donald M. Dillard",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 4",
-            "status": "Active"
-        },
-        {
-            "empid": "EMP10020",
-            "username": "Richard E. Skalski",
-            "permissions": "User",
-            "tags": "VIP",
-            "department": "Department 2",
-            "status": "Active"
+
+    
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        if (data.length>0) {
+            console.log("Data has been set");
         }
-    ], []);
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/incident/get-protected-users', {
+                    withCredentials: true
+                }); 
+                console.log("FETCHED VENDOR DATA: ", response.data);
+            
+                setData(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        console.log("Second UseEffect");
+    }, [data]);
+
+
+    // const data = useMemo(() => [
+    //     {
+    //         "empid": "EMP1001",
+    //         "username": "Richard E. Skalski",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 1",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP1002",
+    //         "username": "Donald M. Dillard",
+    //         "permissions": "Admin",
+    //         "tags": "VIP",
+    //         "department": "Department 2",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP1003",
+    //         "username": "Tyler C. Rodriguez",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 3",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "empid": "EMP1004",
+    //         "username": "Roy D. Barron",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 1",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP1005",
+    //         "username": "Anthony S. Hernandez",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 4",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "empid": "EMP1006",
+    //         "username": "Calvin E. Cuevas",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 2",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP1007",
+    //         "username": "Jimmy A. McGuire",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 3",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP1008",
+    //         "username": "Thomas M. Gadson",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 2",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "empid": "EMP1009",
+    //         "username": "Fred S. Cousins",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 4",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP10010",
+    //         "username": "Russell A. Pearson",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 2",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "empid": "EMP1011",
+    //         "username": "Fred S. Cousins",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 1",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP1012",
+    //         "username": "Thomas M. Gadson",
+    //         "permissions": "Admin",
+    //         "tags": "VIP",
+    //         "department": "Department 2",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "empid": "EMP1013",
+    //         "username": "Jimmy A. McGuire",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 3",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP1014",
+    //         "username": "Calvin E. Cuevas",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 1",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP1015",
+    //         "username": "Anthony S. Hernandez",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 4",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "empid": "EMP1016",
+    //         "username": "Roy D. Barron",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 2",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP1017",
+    //         "username": "Jimmy A. McGuire",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 3",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP1018",
+    //         "username": "Tyler C. Rodriguez",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 2",
+    //         "status": "Inactive"
+    //     },
+    //     {
+    //         "empid": "EMP1019",
+    //         "username": "Donald M. Dillard",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 4",
+    //         "status": "Active"
+    //     },
+    //     {
+    //         "empid": "EMP10020",
+    //         "username": "Richard E. Skalski",
+    //         "permissions": "User",
+    //         "tags": "VIP",
+    //         "department": "Department 2",
+    //         "status": "Active"
+    //     }
+    // ], []);
 
     const textColor = useColorModeValue("secondaryGray.900", "white");
     const optionColor = useColorModeValue('gray.800', 'gray.200');
@@ -446,6 +476,8 @@ function ProtectedUsersTabs() {
     const initialValues = {
         email: '',
         name: '',
+        organizationName: '',
+        status: 'Inactive'
     };
     const [userDetails, setUserDetails] = useState(initialValues);
     const [active, setActive] = useState("Inactive");
@@ -481,7 +513,7 @@ function ProtectedUsersTabs() {
             console.log("Active:", active);
             /*************************************** */
 
-            const newUser = { name: userDetails.name, email: userDetails.email};
+            const newUser = { name: userDetails.name, email: userDetails.email, status: userDetails.status};
 
             const myData = {
                 data: {
@@ -533,7 +565,7 @@ function ProtectedUsersTabs() {
                 <Tabs >
                     <TabList>
                         <Tab _focus={{ boxShadow: "none" }}>User Database</Tab>
-                        <Tab _focus={{ boxShadow: "none" }}>Analysis Reports</Tab>
+                        {/* <Tab _focus={{ boxShadow: "none" }}>Analysis Reports</Tab> */}
                     </TabList>
 
                     <TabPanels>
@@ -653,6 +685,10 @@ function ProtectedUsersTabs() {
                                             <FormLabel>Name</FormLabel>
                                             <Input placeholder='Enter Name' color={textColor} value={userDetails.name} id='name' name='name' onChange={handleChange} />
                                         </FormControl>
+                                        <FormControl mt={4} isRequired >
+                                            <FormLabel>Organization</FormLabel>
+                                            <Input placeholder='Enter Name' color={textColor} value={userDetails.organizationName} id='organizationName' name='organizationName' onChange={handleChange} />
+                                        </FormControl>
                                         
                             
                                         {/* <FormControl mt={4}>
@@ -693,7 +729,7 @@ function ProtectedUsersTabs() {
                             </Modal>
                             <ProtectedUsersTable columns={columns} data={data} />
                         </TabPanel>
-                        <TabPanel>
+                        {/* <TabPanel>
                             <Card
                                 direction='column'
                                 w='100%'
@@ -722,7 +758,7 @@ function ProtectedUsersTabs() {
                                     <UserTrainingRatesDonut />
                                 </SimpleGrid>
                             </Card>
-                        </TabPanel>
+                        </TabPanel> */}
                     </TabPanels>
                 </Tabs>
             </Card>
