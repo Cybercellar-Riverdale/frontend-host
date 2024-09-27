@@ -98,6 +98,13 @@ function EmailAnalysisPage() {
 
     let linkAnalysisStats = null;
     let linkAnalysisUrls = [];
+
+    let fileAnalysis = null;
+    let fileAnalysisSHA256 = null;
+    let fileName = null;
+    let fileSize = null;
+    let fileType = null;
+    let fileDate = null;
     
     if (emailDetails && emailDetails.ipAnalysis && emailDetails.ipAnalysis.data.id && emailDetails.ipAnalysis.data && emailDetails.ipAnalysis.data.attributes && emailDetails.ipAnalysis.data.attributes.last_analysis_stats && emailDetails.ipAnalysis.data.attributes.country) {
         ipAnalysisStats = emailDetails.ipAnalysis.data.attributes.last_analysis_stats;
@@ -128,6 +135,46 @@ function EmailAnalysisPage() {
             }
         }
 
+        fileAnalysis = emailDetails.fileAnalysis;
+        // fileAnalysisSHA256 = emailDetails["fileAnalysis"]["data"]["attributes"]["sha256"];
+        // fileName = emailDetails.fileAnalysis.data.attributes.names[0];
+        // fileSize = formatFileSize(emailDetails.fileAnalysis.data.attributes.size);
+        // fileType = emailDetails.fileAnalysis.data.attributes.type_tag; //check tag_description too
+        // fileDate = convertUnixToDate(emailDetails.fileAnalysis.data.attributes.last_submission_date);
+    }
+
+
+    // if (emailDetails && emailDetails.fileAnalysis && emailDetails.fileAnalysis.data && emailDetails.fileAnalysis.data.attributes && emailDetails.fileAnalysis.data.attributes.size && emailDetails.fileAnalysis.data.attributes.sha256 && emailDetails.fileAnalysis.data.attributes.name) {
+    //     fileAnalysis = emailDetails.fileAnalysis;
+    //     fileAnalysisSHA256 = emailDetails["fileAnalysis"]["data"]["attributes"]["sha256"];
+    //     //fileAnalysisSHA256 = emailDetails.fileAnalysis.data.attributes.sha256;
+    //     fileName = emailDetails.fileAnalysis.data.attributes.names[0];
+    //     fileSize = formatFileSize(emailDetails.fileAnalysis.data.attributes.size)
+    // }
+
+    function convertUnixToDate(unixTimestamp) {
+        const date = new Date(unixTimestamp * 1000); // Convert to milliseconds
+        return date.toLocaleDateString("en-GB", {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    }
+
+    function formatFileSize(bytes) {
+        const kb = 1024;
+        const mb = kb * 1024;
+    
+        if (bytes >= mb) {
+            return (bytes / mb).toFixed(2) + ' MB';
+        } else if (bytes >= kb) {
+            return (bytes / kb).toFixed(2) + ' KB';
+        } else {
+            return bytes + ' Bytes';
+        }
     }
 
     const handleQuarantine = async() => {
@@ -501,15 +548,16 @@ function EmailAnalysisPage() {
                             </Modal>                        
                         </TabPanel>
                         <TabPanel>
-                        <Textarea
-                                value={JSON.stringify(emailDetails.fileAnalysis, null, 2)}
+                            <Textarea
+                                value={` Name of file: ${fileName} \n Sha256: ${fileAnalysisSHA256} \n FILE SIZE: ${fileSize} \n File Type: ${fileType} \n Submission Date: ${fileDate} \n ${JSON.stringify(fileAnalysis)}`}
+                                //value={`FILE ${JSON.stringify(emailDetails.fileAnalysis, null, 1)}`}
                                 readOnly
                                 width="100%"
                                 height="400px"
-                                fontFamily="monospace"
-                                bgColor="gray.100"
-                                color="black"
-                                p={4}
+                                // fontFamily="monospace"
+                                // bgColor="gray.100"
+                                // color="black"
+                                // p={4}
                             />
                         </TabPanel>
                     </TabPanels>
@@ -585,3 +633,103 @@ function EmailAnalysisPage() {
 }
 
 export default EmailAnalysisPage;
+
+
+/*
+  "data": {
+    "id": "17853a0db83f8d1756c047efeec4b1c3f080ca814d996606d8d1e30dcb0479e1",
+    "type": "file",
+    "links": {
+      "self": "https://www.virustotal.com/api/v3/files/17853a0db83f8d1756c047efeec4b1c3f080ca814d996606d8d1e30dcb0479e1"
+    },
+    "attributes": {
+      "size": 695416,
+      "sha256": "17853a0db83f8d1756c047efeec4b1c3f080ca814d996606d8d1e30dcb0479e1",
+      "type_description": "PDF",
+      "last_submission_date": 1726640705,
+      "ssdeep": "12288:4g2bWQn1ptZph115LbeBwgzBLEY2gxAIYGshjlVxjYkxA3BRNwZJj2allhBPJl:4g61ptZpv1gBlBLEWVYGsJlrjY2AtwzR",
+      "pdf_info": {
+        "encrypted": 0,
+        "openaction": 0,
+        "header": "%PDF-1.6",
+        "num_object_streams": 2,
+        "num_obj": 76,
+        "num_endstream": 38,
+        "flash": 0,
+        "embedded_file": 0,
+        "jbig2_compression": 0,
+        "num_endobj": 76,
+        "xfa": 0,
+        "javascript": 0,
+        "js": 0,
+        "startxref": 1,
+        "xref": 2,
+        "num_stream": 38,
+        "acroform": 0,
+        "num_launch_actions": 0,
+        "num_pages": 3,
+        "suspicious_colors": 0,
+        "trailer": 2,
+        "autoaction": 0
+      },
+      "type_tag": "pdf",
+      "names": [
+        "A2en.pdf",
+        "file-6770960_"
+      ],
+      "trid": [
+        {
+          "file_type": "Adobe Portable Document Format",
+          "probability": 100
+        }
+      ],
+      "first_submission_date": 1393305294,
+      "sandbox_verdicts": {
+        "Zenbox": {
+          "category": "harmless",
+          "confidence": 100,
+          "sandbox_name": "Zenbox",
+          "malware_classification": [
+            "CLEAN"
+          ]
+        }
+      },
+      "reputation": 0,
+      "sha1": "a96c7eee033c2fa7975217becaeeacc9813e86b5",
+      "unique_sources": 6,
+      "tags": [
+        "pdf",
+        "checks-user-input",
+        "checks-network-adapters"
+      ],
+      "type_tags": [
+        "document",
+        "pdf"
+      ],
+      "meaningful_name": "A2en.pdf",
+      "type_extension": "pdf",
+      "last_analysis_date": 1708032112,
+      "last_modification_date": 1726640705,
+      "times_submitted": 14,
+      "creation_date": 1390400921,
+      "total_votes": {
+        "harmless": 0,
+        "malicious": 0
+      },
+      "magic": "PDF document, version 1.6, 2 pages (zip deflate encoded)",
+      "vhash": "997b27a30f47458f8721f54bf66eb58ea",
+      "tlsh": "T1ABE41268F3A06AEDEE460719074FBA0A1F0F73B2B9CC05427EAD8F455790E69C26B145",
+      "md5": "617f6d23cfc27af0f33765ca7551f4d0",
+      "last_analysis_stats": {
+        "malicious": 0,
+        "suspicious": 0,
+        "undetected": 61,
+        "harmless": 0,
+        "timeout": 0,
+        "confirmed-timeout": 0,
+        "failure": 0,
+        "type-unsupported": 15
+      }
+    }
+  }
+} */
