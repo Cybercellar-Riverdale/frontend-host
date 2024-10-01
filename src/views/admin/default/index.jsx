@@ -60,6 +60,7 @@ export default function UserReports() {
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
 
   const [data, setData] = useState([]);
+  const [incidentLogs, setIncidentLogs] = useState([]);
   const [email_no, set_email_no] = useState(0);
   const [vendors_no, set_vendors_no] = useState('0');
   const [users_no, set_users_no] = useState('0');
@@ -68,6 +69,26 @@ export default function UserReports() {
 
   const [threatSeverity, setThreatSeverity] = useState(null);
 
+  const [months, setMonths] = useState(null);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/incident/get-incident-logs', {
+                withCredentials: true, // Ensures the cookie is included in the request
+            }); // Replace with your actual API endpoint
+            console.log("FETCHED INCIDENT LOGS: ", response);
+            setIncidentLogs(response.data);
+            
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            
+        }
+    };
+
+    fetchData();
+}, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -199,11 +220,54 @@ useEffect(() => {
     setThreatSeverity(threatSeverity);
   };
 
+  const tallyMonths = async (arrayOfObjects) => {
+    
+    const monthTally = {
+      January: 0,
+      February: 0,
+      March: 0,
+      April: 0,
+      May: 0,
+      June: 0,
+      July: 0,
+      August: 0,
+      September: 0,
+      October: 0,
+      November: 0,
+      December: 0
+    };
+  
+    // Iterate over the array of objects
+    arrayOfObjects.forEach(obj => {
+      const month = obj.month;
+  
+    if (monthTally[month] !== undefined) {
+        monthTally[month]++;
+      }
+    });
+  
+    setMonths(monthTally);
+  };
+
 useEffect(() => {
   if (data.length > 0) {
     tallyEmailCategories(data);
   }
 }, [data]);
+
+// New useEffect to log when months is updated
+useEffect(() => {
+  if (months !== null) {
+    console.log("MONTHS UPDATED: ", months);
+  }
+}, [months]);
+
+// UseEffect that updates months based on incidentLogs
+useEffect(() => {
+  if (incidentLogs.length > 0) {
+    tallyMonths(incidentLogs);
+  }
+}, [incidentLogs]);
 
 
 
@@ -275,14 +339,14 @@ useEffect(() => {
       {/* <Text fontSize="30px" fontWeight="600" >Email Traffic Overview</Text> */}
 
       <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
-        <RealTimeThreatBar />
+      {months && <RealTimeThreatBar months = {months} /> }
         {threatSeverity && <RealTimeThreatPie threatSeverity={threatSeverity} />}
         {/* <TotalSpent /> */}
         {/* <DailyTraffic /> */}
         {/* <WeeklyRevenue /> */}
       </SimpleGrid>
       <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
-        <ThreatsDetectedLine />
+      {months && <ThreatsDetectedLine months={months} /> }
         <ThreatTrendsBar />
         {/* <CheckTable columnsData={columnsDataCheck} tableData={tableDataCheck} /> */}
         {/* <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'> */}

@@ -15,11 +15,23 @@ import Card from "components/card/Card.js";
 import { RiArrowUpSFill } from "react-icons/ri";
 
 export default function RealTimeThreatBar(props) {
-    const { ...rest } = props;
+    const { months, ...rest } = props;
 
-    const barChartDataTotalEmailProcessed = [{
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June', 
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      let monthArray = [];
+
+      if (months) {
+        monthArray = monthNames.map(month => months[month] ?? 0);
+      }
+      console.log("MONTHS IN REALTIMETHREATBAR ", monthArray);
+    
+      const barChartDataTotalEmailProcessed = [{
         name: "Real Time Threat Alerts",
-        data: [20, 30, 40, 20, 45, 50, 30, 20, 40, 50, 28, 10],
+        // data: [0,0,0,0,0,0,0,0,1,0,0,0],
+        data: monthArray.slice(),
     },
     ];
 

@@ -473,14 +473,15 @@ function ProtectedUsersTabs() {
         setExpandedIndex(null); // Set to null to close the Accordion
     };
 
+    const [active, setActive] = useState("Inactive");
+
     const initialValues = {
         email: '',
         name: '',
         organizationName: '',
-        status: 'Inactive'
+        status: active
     };
     const [userDetails, setUserDetails] = useState(initialValues);
-    const [active, setActive] = useState("Inactive");
 
     const handleChange = (e) => {
         setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
@@ -513,7 +514,7 @@ function ProtectedUsersTabs() {
             console.log("Active:", active);
             /*************************************** */
 
-            const newUser = { name: userDetails.name, email: userDetails.email, status: userDetails.status};
+            const newUser = { name: userDetails.name, email: userDetails.email, status: active};
 
             const myData = {
                 data: {

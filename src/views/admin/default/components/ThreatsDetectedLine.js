@@ -21,12 +21,18 @@ import { RiArrowUpSFill } from "react-icons/ri";
 // } from "variables/charts";
 
 export default function ThreatsDetectedLine(props) {
-  const { ...rest } = props;
-
+  const {months, ...rest } = props;
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June', 
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      
+    const monthArray = monthNames.map(month => months[month] || 0);
+  console.log("MONTHS ARRAY: ", monthArray);
   const lineChartDataThreatDetectedLine = [
     {
       name: "Number of Threats Detected",
-      data: [2, 5, 3, 2, 4, 6, 8, 10, 5, 7, 3, 6],
+      data: monthArray
     },
     // {
     //   name: "Total",
