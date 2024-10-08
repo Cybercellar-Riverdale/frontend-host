@@ -225,6 +225,7 @@ function MailboxMonitoringTabs() {
     ], []);
 
     const [data, setData] = useState([]);
+    const [tempData, setTempData] = useState([]);
 
     const [months, setMonths] = useState(null);
 
@@ -388,25 +389,60 @@ function MailboxMonitoringTabs() {
     const [filter, setFilter] = useState(initialValues);
 
     const handleFilterChange = (e) => {
+        console.log("E TARGET: ",e.target.name);
+        console.log("E TARGET: ",e.target.value);
         setFilter({ ...filter, [e.target.name]: e.target.value });
+        console.log(filter);
     }
 
     const handleSave = () => {
-        if (!filter.sender) {
-            toast.error('Please enter sender', {
-                position: toast.POSITION.TOP_CENTER,
-                theme: colorMode,
-            }
-            );
+        setTempData(data);
+        const now = new Date();
+        let startDate, endDate;
+      
+        if (filter.timeDuration === '24 Hours') {
+          startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        } else if (filter.timeDuration === '72 Hours') {
+          startDate = new Date(now.getTime() - 72 * 60 * 60 * 1000);
+        } else if (filter.timeDuration === '1 Week') {
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        } else if (filter.timeDuration === '1 Month') {
+          startDate = new Date(now.setMonth(now.getMonth() - 1));
+        } else if (filter.timeDuration === 'Custom Date') {
+          // Use the selected custom date range
+          startDate = new Date(filter.startDate);
+          endDate = new Date(filter.endDate);
         }
-        console.log("Save clicked");
-        console.log("Entered Data:", filter);
+      
+            const dateFilteredData = data.filter(email => {
+            const emailDate = new Date(email.date); // Convert the email date string to a Date object
+        
+            if (filter.timeDuration === 'Custom Date') {
+              return emailDate >= startDate && emailDate <= endDate;
+            } else if (startDate) {
+              return emailDate >= startDate;
+            }
+            return true;
+          });
+        
+          // Now apply other filters for sender, recipient, and subject
+          const finalFilteredData = dateFilteredData.filter(email => {
+            const senderMatch = filter.sender ? email.senderEmail.toLowerCase().includes(filter.sender.toLowerCase()) : true;
+            const recipientMatch = filter.recipient ? email.recipient.toLowerCase().includes(filter.recipient.toLowerCase()) : true;
+            const subjectMatch = filter.subject ? email.subject.toLowerCase().includes(filter.subject.toLowerCase()) : true;
+        
+            return senderMatch && recipientMatch && subjectMatch;
+          });
+
+          setData(finalFilteredData);
     }
 
     const [expandedIndex, setExpandedIndex] = useState(null); // Manage expanded index state
 
     const handleCancel = () => {
         setExpandedIndex(null); // Set to null to close the Accordion
+        setData(tempData);
+        setFilter(initialValues);
     };
 
     useEffect(() => {
