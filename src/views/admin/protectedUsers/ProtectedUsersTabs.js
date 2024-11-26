@@ -39,6 +39,8 @@ export function ProtectedUsersTable({ columns, data }) {
         usePagination
     );
 
+
+
     const {
         rows,
         getTableProps,
@@ -226,6 +228,7 @@ function ProtectedUsersTabs() {
 
     
     const [data, setData] = useState([]);
+    const [tempData, setTempData] = useState([]);
 
     useEffect(() => {
         if (data.length>0) {
@@ -233,10 +236,11 @@ function ProtectedUsersTabs() {
         }
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/incident/get-protected-users', {
+                const PUBLIC_BACKEND_URL = "http://localhost:8080"
+                const response = await axios.get(`${PUBLIC_BACKEND_URL}/incident/get-protected-users`, {
                     withCredentials: true
                 }); 
-                console.log("FETCHED VENDOR DATA: ", response.data);
+                console.log("FETCHED USER DATA: ", response.data);
             
                 setData(response.data);
             } catch (error) {
@@ -439,37 +443,56 @@ function ProtectedUsersTabs() {
     }
 
     const handleFilterSave = () => {
-        if (filter.permission === '--Select Permission--') {
-            toast.error('Please select a permission', {
-                position: toast.POSITION.TOP_CENTER,
-                theme: colorMode,
-            }
-            );
-        }
-        else if (filter.tag === '--Select Tags--') {
-            toast.error('Please select a tag', {
-                position: toast.POSITION.TOP_CENTER,
-                theme: colorMode,
-            }
-            );
-        }
-        else if (filter.department === '--Select Department--') {
-            toast.error('Please select a department', {
-                position: toast.POSITION.TOP_CENTER,
-                theme: colorMode,
-            }
-            );
-        }
-        else {
+
+        // if (filter.permission === '--Select Permission--') {
+        //     toast.error('Please select a permission', {
+        //         position: toast.POSITION.TOP_CENTER,
+        //         theme: colorMode,
+        //     }
+        //     );
+        // }
+        // else if (filter.tag === '--Select Tags--') {
+        //     toast.error('Please select a tag', {
+        //         position: toast.POSITION.TOP_CENTER,
+        //         theme: colorMode,
+        //     }
+        //     );
+        // }
+        // else if (filter.department === '--Select Department--') {
+        //     toast.error('Please select a department', {
+        //         position: toast.POSITION.TOP_CENTER,
+        //         theme: colorMode,
+        //     }
+        //     );
+        // }
+        // else {
+
+            setTempData(data);
+
+            const { permission, tag, department } = filter;
+
+            // Filter the data based on the selected values
+            const filteredData = data.filter(user => {
+                const matchesPermission = permission === '--Select Permission--' || user.permissions === permission;
+                const matchesTag = tag === '--Select Tags--' || user.tags === tag; // Assuming there's a `tags` field in your data
+                const matchesDepartment = department === '--Select Department--' || user.department === department; // Assuming there's a `department` field in your data
+        
+                return matchesPermission && matchesTag && matchesDepartment;
+            });
+
+            setData(filteredData);
+
             console.log("Save clicked");
             console.log("Entered Data:", filter);
-        }
+        // }
 
     }
 
     const [expandedIndex, setExpandedIndex] = useState(null); // Manage expanded index state
 
     const handleCancel = () => {
+        setData(tempData);
+        setFilter(initialValues);
         setExpandedIndex(null); // Set to null to close the Accordion
     };
 

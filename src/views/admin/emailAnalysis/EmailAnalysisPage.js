@@ -135,7 +135,7 @@ function EmailAnalysisPage() {
             }
         }
 
-        fileAnalysis = emailDetails.fileAnalysis;
+        // fileAnalysis = emailDetails.fileAnalysis;
         // fileAnalysisSHA256 = emailDetails["fileAnalysis"]["data"]["attributes"]["sha256"];
         // fileName = emailDetails.fileAnalysis.data.attributes.names[0];
         // fileSize = formatFileSize(emailDetails.fileAnalysis.data.attributes.size);
@@ -147,10 +147,19 @@ function EmailAnalysisPage() {
     // if (emailDetails && emailDetails.fileAnalysis && emailDetails.fileAnalysis.data && emailDetails.fileAnalysis.data.attributes && emailDetails.fileAnalysis.data.attributes.size && emailDetails.fileAnalysis.data.attributes.sha256 && emailDetails.fileAnalysis.data.attributes.name) {
     //     fileAnalysis = emailDetails.fileAnalysis;
     //     fileAnalysisSHA256 = emailDetails["fileAnalysis"]["data"]["attributes"]["sha256"];
-    //     //fileAnalysisSHA256 = emailDetails.fileAnalysis.data.attributes.sha256;
+    //     fileAnalysisSHA256 = emailDetails.fileAnalysis.data.attributes.sha256;
     //     fileName = emailDetails.fileAnalysis.data.attributes.names[0];
     //     fileSize = formatFileSize(emailDetails.fileAnalysis.data.attributes.size)
     // }
+
+
+    if (emailDetails && emailDetails.fileAnalysis?.data?.attributes) {
+        const { sha256, size, names } = emailDetails.fileAnalysis.data.attributes;
+        fileAnalysisSHA256 = sha256;
+        fileName = names[0];
+        fileSize = formatFileSize(size);
+    }
+    
 
     function convertUnixToDate(unixTimestamp) {
         const date = new Date(unixTimestamp * 1000); // Convert to milliseconds
@@ -484,6 +493,8 @@ function EmailAnalysisPage() {
                                 overflow="auto"
                                 whiteSpace="pre-wrap"
                             >
+                                {`${JSON.stringify(domainAnalysisStats, null, 2)} \n`}
+
                                 Domain: {JSON.stringify(domainAnalysisUrl, null, 2)}
                                 <br />
                                 Domain Classification: {JSON.stringify(domainAnalysisCategory, null, 2)}
@@ -522,6 +533,10 @@ function EmailAnalysisPage() {
                                 overflow="auto"
                                 whiteSpace="pre-wrap"
                             >
+                            
+                            {`Analysis Results: \n${JSON.stringify(linkAnalysisStats, null, 2)} \n`}
+                                   
+
                                 {linkAnalysisUrls.map((url, index) => (
                                     <Box key={index}>
                                         <Text as="span" color="blue.500" cursor="pointer" onClick={() => {handleLinkAnalysisClick(url)}}>
@@ -531,6 +546,7 @@ function EmailAnalysisPage() {
                                     </Box>
                                 ))} 
                             </Box>
+                            
                             <Modal isOpen={isLinkAnalysisOpen} onClose={onLinkAnalysisClose}>
                                 <ModalOverlay />
                                 <ModalContent maxW="400px">

@@ -45,7 +45,6 @@
     "stylis-plugin-rtl": "2.0.2",
     "web-vitals": "^1.1.2"
   },
-  "homepage": "https://cybercellar-riverdale.github.io/cybercellar-frontend/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

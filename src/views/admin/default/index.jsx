@@ -71,11 +71,13 @@ export default function UserReports() {
 
   const [months, setMonths] = useState(null);
 
+  const PUBLIC_BACKEND_URL = "http://localhost:8080"
+
 
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/incident/get-incident-logs', {
+            const response = await axios.get(`${PUBLIC_BACKEND_URL}/incident/get-incident-logs`, {
                 withCredentials: true, // Ensures the cookie is included in the request
             }); // Replace with your actual API endpoint
             console.log("FETCHED INCIDENT LOGS: ", response);
@@ -93,7 +95,7 @@ export default function UserReports() {
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/incident/get-mailbox', {
+            const response = await axios.get(`${PUBLIC_BACKEND_URL}/incident/get-mailbox`, {
                 withCredentials: true, // Ensures the cookie is included in the request
             }); // Replace with your actual API endpoint
             console.log("FETCHED DATA: ", response);
@@ -111,7 +113,7 @@ export default function UserReports() {
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/incident/get-mailbox', {
+            const response = await axios.get(`${PUBLIC_BACKEND_URL}/incident/get-mailbox`, {
                 withCredentials: true, // Ensures the cookie is included in the request
             }); // Replace with your actual API endpoint
             console.log("FETCHED DATA: ", response);
@@ -132,7 +134,7 @@ export default function UserReports() {
 useEffect(() => {
   const fetchData = async () => {
       try {
-          const response = await axios.get('http://localhost:8080/incident/get-vendors', {
+          const response = await axios.get(`${PUBLIC_BACKEND_URL}/incident/get-vendors`, {
               withCredentials: true, // Ensures the cookie is included in the request
           }); // Replace with your actual API endpoint
           console.log("FETCHED DATA: ", response);
@@ -151,7 +153,7 @@ useEffect(() => {
 useEffect(() => {
   const fetchData = async () => {
       try {
-          const response = await axios.get('http://localhost:8080/incident/get-protected-users', {
+          const response = await axios.get(`${PUBLIC_BACKEND_URL}/incident/get-protected-users`, {
               withCredentials: true, // Ensures the cookie is included in the request
           }); // Replace with your actual API endpoint
           console.log("FETCHED USERS DATA: ", response);
@@ -169,7 +171,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/incident/get-threat-severity', {
+            const response = await axios.get(`${PUBLIC_BACKEND_URL}/incident/get-threat-severity`, {
                 withCredentials: true, // Ensures the cookie is included in the request
             }); // Replace with your actual API endpoint
             console.log("FETCHED THREAT SEVERITY: ", response);

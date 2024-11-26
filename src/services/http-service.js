@@ -2,7 +2,8 @@ import Axios from "axios";
 
 // const API_URL = process.env.REACT_APP_BACKEND_SERVER;
 console.log(process.env.REACT_APP_BACKEND_SERVER)
-const API_URL = "http://localhost:8080/"
+// const API_URL = "http://localhost:8080/"
+const API_URL = 'http://localhost:8080/';
 Axios.defaults.baseURL = API_URL;
 
 export class HttpService {
@@ -16,7 +17,10 @@ export class HttpService {
     this._axios.interceptors.response.use(onFulfilled, onRejected);
   };
 
-  get = async (url) => await this.request(this.getOptionsConfig("get", url));
+  get = async (url) => {
+    await this.request(this.getOptionsConfig("get", url));
+    console.log("url: ",url);
+  }
 
   post = async (url, data) => await this.request(this.getOptionsConfig("post", url, data));
 

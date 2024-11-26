@@ -213,6 +213,8 @@ function VendorDatabaseTable() {
     ], []);
 
     const [data, setData] = useState([]);
+    
+    const [tempData, setTempData] = useState([]);
 
     useEffect(() => {
         if (data.length>0) {
@@ -220,7 +222,8 @@ function VendorDatabaseTable() {
         }
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/incident/get-vendors', {
+                const PUBLIC_BACKEND_URL = "http://localhost:8080"
+                const response = await axios.get(`${PUBLIC_BACKEND_URL}/incident/get-vendors`, {
                     withCredentials: true
                 }); 
                 console.log("FETCHED VENDOR DATA: ", response);
@@ -353,24 +356,28 @@ function VendorDatabaseTable() {
     }
 
     const handleFilterSave = () => {
-        if (!filter.name) {
-            toast.error('Please enter a name', {
-                position: toast.POSITION.TOP_CENTER,
-                theme: colorMode,
-            }
-            );
-        }
-        else if (filter.status === '--Select Status--') {
-            toast.error('Please select a status', {
-                position: toast.POSITION.TOP_CENTER,
-                theme: colorMode,
-            }
-            );
-        }
-        else {
+        // if (!filter.name) {
+        //     toast.error('Please enter a name', {
+        //         position: toast.POSITION.TOP_CENTER,
+        //         theme: colorMode,
+        //     }
+        //     );
+        // }
+        // else if (filter.status === '--Select Status--') {
+        //     toast.error('Please select a status', {
+        //         position: toast.POSITION.TOP_CENTER,
+        //         theme: colorMode,
+        //     }
+        //     );
+        // }
+        // else {
+
+
             console.log("Save clicked");
             console.log("Entered Data:", filter);
-        }
+
+
+        // }
     }
 
     const [expandedIndex, setExpandedIndex] = useState(null); // Manage expanded index state

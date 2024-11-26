@@ -276,7 +276,7 @@ function IncidentAnalysisTabs() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/incident/get-incident-logs', {
+                const response = await axios.get("http://localhost:8080/incident/get-incident-logs", {
                     withCredentials: true, // Ensures the cookie is included in the request
                 }); 
                 console.log("FETCHED DATA: ", response);
@@ -296,7 +296,7 @@ function IncidentAnalysisTabs() {
         }
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/incident/get-spf-count', {
+                const response = await axios.get(`${process.env.PUBLIC_BACKEND_URL}/incident/get-spf-count`, {
                     withCredentials: true
                 }); 
                 console.log("FETCHED DATA: ", response);
