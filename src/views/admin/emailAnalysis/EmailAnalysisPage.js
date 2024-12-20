@@ -9,8 +9,16 @@ import DKIMCheckPie from '../incidentLog/DKIMCheckPie';
 import DMARCCheckPie from '../incidentLog/DMARCCheckPie';
 import GaugeChart from './GaugeChart';
 import AuthService from 'services/auth-service';
+import { ReactFlow, MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 
 let details = '';
+
+const initialNodes = [
+    { id: '1', position: { x: 0, y: 0 }, data: { label: '1' } },
+    { id: '2', position: { x: 0, y: 100 }, data: { label: '2' } },
+  ];
+  const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
 
 function EmailAnalysisPage() {
     const [emailDetails, setEmailDetails] = useState('');
@@ -208,6 +216,16 @@ function EmailAnalysisPage() {
             
         }
     }
+
+    
+
+    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+   
+    const onConnect = useCallback(
+      (params) => setEdges((eds) => addEdge(params, eds)),
+      [setEdges],
+    );
 
     return (
         // <div>Hello{emailId.email_id}</div>
@@ -456,7 +474,9 @@ function EmailAnalysisPage() {
                         <Tab>IP Check</Tab>
                         <Tab>Domain Analysis</Tab>
                         <Tab>Link Analysis</Tab>
-                        <Tab>File Analysis</Tab>                        
+                        <Tab>File Analysis</Tab>               
+                        <Tab>Link Redirects</Tab>
+                        <Tab>Domain Impersonation</Tab>         
                     </TabList>
                     <TabPanels>
                         <TabPanel>            
@@ -575,6 +595,35 @@ function EmailAnalysisPage() {
                                 // color="black"
                                 // p={4}
                             />
+                        </TabPanel>
+                        <TabPanel>
+                        <GaugeChart value={malicious_stats} total={no_of_vendors} onClick={onGaugeChartOpen}/>
+                            <Modal isOpen={isGaugeChartOpen} onClose={onGaugeChartClose} >
+                                <ModalOverlay />
+                                <ModalContent maxW='-webkit-fit-content'>
+                                <ModalHeader></ModalHeader>
+                                <ModalCloseButton />
+                                <ModalBody mt={4}>
+                                
+                                <Textarea value={`IP Address: ${JSON.stringify(ipAddress, null, 1)} \n Vendor Analysis: ${JSON.stringify(ipAnalysisStats, null, 1)} \n Country: ${JSON.stringify(ipCountry, null, 1)} \n `} readOnly width="400px" height="400px" />                                    
+                                </ModalBody>
+                                </ModalContent>
+                            </Modal>
+                        </TabPanel>
+                        <TabPanel>
+                            <div style={{ width: '100vw', height: '100vh' }}>
+                                <ReactFlow
+                                    nodes={nodes}
+                                    edges={edges}
+                                    onNodesChange={onNodesChange}
+                                    onEdgesChange={onEdgesChange}
+                                    onConnect={onConnect}
+                                >
+                                    <Controls />
+                                    <MiniMap />
+                                    <Background variant="dots" gap={12} size={1} />
+                                </ReactFlow>
+                            </div>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
