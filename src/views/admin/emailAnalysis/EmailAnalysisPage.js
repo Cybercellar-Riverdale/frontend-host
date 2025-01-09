@@ -1,24 +1,68 @@
 import { Box, Button, Flex, FormControl, FormLabel, Input, SimpleGrid, Table, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue, Tabs, TabList, TabPanels, Tab, TabPanel, Textarea, useDisclosure, Modal, ModalOverlay, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, ModalContent, Divider, Select, } from '@chakra-ui/react';
 import Card from 'components/card/Card';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import SPFCheckPie from '../incidentLog/SPFCheckPie';
 import SPFResult from '../incidentLog/SPFResult';
+import AnalysisCard from './AnalysisCard';
 import DKIMCheckPie from '../incidentLog/DKIMCheckPie';
 import DMARCCheckPie from '../incidentLog/DMARCCheckPie';
 import GaugeChart from './GaugeChart';
 import AuthService from 'services/auth-service';
-import { ReactFlow, MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
+import { ReactFlow, Handle, Position, MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 let details = '';
 
 const initialNodes = [
-    { id: '1', position: { x: 0, y: 0 }, data: { label: '1' } },
-    { id: '2', position: { x: 0, y: 100 }, data: { label: '2' } },
+    { id: '1', position: { x: 0, y: 0 }, data: { label: 'https://www.amaz0n.com' }, type: 'custom' },
+    { id: '2', position: { x: 300, y: 0 }, data: { label: 'https://localhost:7201' }, type: 'custom' },
+    { id: '3', position: { x: 600, y: 0 }, data: { label: 'https://amazon.com' }, type: 'custom' },
   ];
-  const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
+//   const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
+
+const initialEdges = [
+    {
+      id: 'e1-2',
+      source: '1',
+      target: '2',
+      label: '20ms', // Example number to display along the edge
+      style: { stroke: 'blue', strokeWidth: 2 }, // Styling the edge
+      labelStyle: { fill: 'black', fontWeight: 'bold' }, // Styling the edge label
+    },
+    {
+        id: 'e2-3',
+        source: '2',
+        target: '3',
+        label: '48ms', // Example number to display along the edge
+        style: { stroke: 'blue', strokeWidth: 2 }, // Styling the edge
+        labelStyle: { fill: 'black', fontWeight: 'bold' }, // Styling the edge label
+      },
+  ];
+
+
+
+const CustomNode = ({ data }) => {
+    return (
+      <div style={{ padding: 10, border: '2px solid white', borderRadius: 5, backgroundColor: 'white', textAlign: 'center', boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)', }}>
+         <div style={{ color: 'black', fontWeight: 'bold' }}>{data.label}</div>
+        {/* Add horizontal handles */}
+        <Handle
+          type="source"
+          position={Position.Right}
+          style={{ top: '50%', background: 'blue', width: 10, height: 10 }}
+        />
+        <Handle
+          type="target"
+          position={Position.Left}
+          style={{ top: '50%', background: 'red', width: 10, height: 10 }}
+        />
+      </div>
+    );
+  };
+
+
 
 function EmailAnalysisPage() {
     const [emailDetails, setEmailDetails] = useState('');
@@ -513,20 +557,24 @@ function EmailAnalysisPage() {
                                 overflow="auto"
                                 whiteSpace="pre-wrap"
                             >
-                                {`${JSON.stringify(domainAnalysisStats, null, 2)} \n`}
 
-                                Domain: {JSON.stringify(domainAnalysisUrl, null, 2)}
+                                <AnalysisCard data={ domainAnalysisStats || {} } />
+
+
+                                {/* {`${JSON.stringify(domainAnalysisStats, null, 2)} \n`} */}
+
+                                {/* Domain: {JSON.stringify(domainAnalysisUrl, null, 2)}
                                 <br />
                                 Domain Classification: {JSON.stringify(domainAnalysisCategory, null, 2)}
-                                <br />
+                                <br /> */}
                                 {/* Clickable part for analysis details */}
-                                <Text as="span" color="blue.500" cursor="pointer" onClick={() => window.open(`https://www.virustotal.com/gui/search/${domainAnalysisUrl}`, "_blank")}>
+                                {/* <Text as="span" color="blue.500" cursor="pointer" onClick={() => window.open(`https://www.virustotal.com/gui/search/${domainAnalysisUrl}`, "_blank")}>
                                 (Click for analysis details)
-                                </Text>
+                                </Text> */}
                             </Box>
 
                             {/* Modal for domain analysis */}
-                            <Modal isOpen={isDomainAnalysisOpen} onClose={onDomainAnalysisClose}>
+                            {/* <Modal isOpen={isDomainAnalysisOpen} onClose={onDomainAnalysisClose}>
                                 <ModalOverlay />
                                 <ModalContent maxW="400px">
                                 <ModalHeader></ModalHeader>
@@ -540,7 +588,7 @@ function EmailAnalysisPage() {
                                     />
                                 </ModalBody>
                                 </ModalContent>
-                            </Modal>
+                            </Modal> */}
                         </TabPanel>
 
                         <TabPanel>
@@ -553,21 +601,39 @@ function EmailAnalysisPage() {
                                 overflow="auto"
                                 whiteSpace="pre-wrap"
                             >
+
+                                <AnalysisCard data={ linkAnalysisStats?.[0] || {} } />
+
+                                {/* <AnalysisCard data={ {
+  "url": "example.com",
+  "severityScore": 8,
+  "severity": "High",
+  "category": "Phishing",
+  "stats": {
+    "harmless": 10,
+    "malicious": 5,
+    "suspicious": 3,
+    "undetected": 1,
+    "timeout": 0
+  }
+} || {} } /> */}
+
+
                             
-                            {`Analysis Results: \n${JSON.stringify(linkAnalysisStats, null, 2)} \n`}
+                            {/* {`Analysis Results: \n${JSON.stringify(linkAnalysisStats, null, 2)} \n`} */}
                                    
 
-                                {linkAnalysisUrls.map((url, index) => (
+                                {/* {linkAnalysisUrls.map((url, index) => (
                                     <Box key={index}>
                                         <Text as="span" color="blue.500" cursor="pointer" onClick={() => {handleLinkAnalysisClick(url)}}>
                                             {url}
                                         </Text>
                                         <br />
                                     </Box>
-                                ))} 
+                                ))}  */}
                             </Box>
                             
-                            <Modal isOpen={isLinkAnalysisOpen} onClose={onLinkAnalysisClose}>
+                            {/* <Modal isOpen={isLinkAnalysisOpen} onClose={onLinkAnalysisClose}>
                                 <ModalOverlay />
                                 <ModalContent maxW="400px">
                                 <ModalHeader></ModalHeader>
@@ -581,7 +647,7 @@ function EmailAnalysisPage() {
                                     />
                                 </ModalBody>
                                 </ModalContent>
-                            </Modal>                        
+                            </Modal>                         */}
                         </TabPanel>
                         <TabPanel>
                             <Textarea
@@ -597,6 +663,33 @@ function EmailAnalysisPage() {
                             />
                         </TabPanel>
                         <TabPanel>
+                            <div style={{ width: '100vw', height: '100vh' }}>
+                                <ReactFlow
+                                    nodes={nodes}
+                                    edges={edges}
+                                    nodeTypes={{ custom: CustomNode }}
+                                    // onNodesChange={onNodesChange}
+                                    // onEdgesChange={onEdgesChange}
+                                    // onConnect={onConnect}
+                                    fitView
+                                >
+                                    <Handle
+                                    type="source"
+                                    position={Position.Right} // Horizontal handle
+                                    style={{ top: '50%', background: 'blue', width: 10, height: 10 }}
+                                    />
+                                     <Handle
+                                    type="target"
+                                    position={Position.Left} // Another horizontal handle
+                                    style={{ top: '50%', background: 'red', width: 10, height: 10 }}
+                                    />
+                                    <Controls />
+                                    <MiniMap />
+                                    <Background variant="dots" gap={12} size={1} />
+                                </ReactFlow>
+                            </div>
+                        </TabPanel>
+                        <TabPanel>
                         <GaugeChart value={malicious_stats} total={no_of_vendors} onClick={onGaugeChartOpen}/>
                             <Modal isOpen={isGaugeChartOpen} onClose={onGaugeChartClose} >
                                 <ModalOverlay />
@@ -609,21 +702,6 @@ function EmailAnalysisPage() {
                                 </ModalBody>
                                 </ModalContent>
                             </Modal>
-                        </TabPanel>
-                        <TabPanel>
-                            <div style={{ width: '100vw', height: '100vh' }}>
-                                <ReactFlow
-                                    nodes={nodes}
-                                    edges={edges}
-                                    onNodesChange={onNodesChange}
-                                    onEdgesChange={onEdgesChange}
-                                    onConnect={onConnect}
-                                >
-                                    <Controls />
-                                    <MiniMap />
-                                    <Background variant="dots" gap={12} size={1} />
-                                </ReactFlow>
-                            </div>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
