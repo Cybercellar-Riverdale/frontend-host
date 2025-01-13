@@ -13,7 +13,7 @@ import {
 
 import Card from "components/card/Card";
 
-const AnalysisCard = ({ data, ...rest }) => {
+const DomainAnalysisCard = ({ data, ...rest }) => {
 
   const impersonationResults =[
     { word: "microsof.com", distance: 3 },
@@ -112,42 +112,9 @@ const AnalysisCard = ({ data, ...rest }) => {
             </Stat>
           </StatGroup>
         </Card>
-  
-        {impersonationResults?.length > 0 && (
-          <Box mt={8} p={4} borderRadius="md" bg="gray.700" color="white">
-            <Text fontSize="lg" fontWeight="bold" mb={4}>
-              Impersonation Detection
-            </Text>
-  
-            <Text fontSize="md" mb={2}>
-              The domain <b>www.m!cros0fl.com</b> appears to be an impersonator. Below are the domains it might be impersonating:
-            </Text>
-  
-            <Box mt={4} pl={4}>
-              {impersonationResults.map((result, index) => (
-                <Flex
-                  key={index}
-                  align="center"
-                  justify="space-between"
-                  p={2}
-                  borderBottom="1px solid"
-                  borderColor="gray.600"
-                >
-                  <Text fontSize="md" color="blue.300">
-                    {result.word}
-                  </Text>
-
-                  <Tag size="md" colorScheme="teal">
-                    Distance: {result.distance}
-                  </Tag>
-                </Flex>
-              ))}
-            </Box>
-          </Box>
-        )}
       </>
     );
   };
 
 
-export default AnalysisCard;
+export default DomainAnalysisCard;

@@ -12,6 +12,7 @@ import GaugeChart from './GaugeChart';
 import AuthService from 'services/auth-service';
 import { ReactFlow, Handle, Position, MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import DomainAnalysisCard from './DomainAnalysisCard';
 
 let details = '';
 
@@ -519,8 +520,7 @@ function EmailAnalysisPage() {
                         <Tab>Domain Analysis</Tab>
                         <Tab>Link Analysis</Tab>
                         <Tab>File Analysis</Tab>               
-                        <Tab>Link Redirects</Tab>
-                        <Tab>Domain Impersonation</Tab>         
+                        <Tab>Link Redirects</Tab>                    
                     </TabList>
                     <TabPanels>
                         <TabPanel>            
@@ -558,7 +558,7 @@ function EmailAnalysisPage() {
                                 whiteSpace="pre-wrap"
                             >
 
-                                <AnalysisCard data={ domainAnalysisStats || {} } />
+                                <DomainAnalysisCard data={ domainAnalysisStats || {} } />
 
 
                                 {/* {`${JSON.stringify(domainAnalysisStats, null, 2)} \n`} */}
@@ -688,21 +688,7 @@ function EmailAnalysisPage() {
                                     <Background variant="dots" gap={12} size={1} />
                                 </ReactFlow>
                             </div>
-                        </TabPanel>
-                        <TabPanel>
-                        <GaugeChart value={malicious_stats} total={no_of_vendors} onClick={onGaugeChartOpen}/>
-                            <Modal isOpen={isGaugeChartOpen} onClose={onGaugeChartClose} >
-                                <ModalOverlay />
-                                <ModalContent maxW='-webkit-fit-content'>
-                                <ModalHeader></ModalHeader>
-                                <ModalCloseButton />
-                                <ModalBody mt={4}>
-                                
-                                <Textarea value={`IP Address: ${JSON.stringify(ipAddress, null, 1)} \n Vendor Analysis: ${JSON.stringify(ipAnalysisStats, null, 1)} \n Country: ${JSON.stringify(ipCountry, null, 1)} \n `} readOnly width="400px" height="400px" />                                    
-                                </ModalBody>
-                                </ModalContent>
-                            </Modal>
-                        </TabPanel>
+                        </TabPanel>                        
                     </TabPanels>
                 </Tabs>
             </Card>
