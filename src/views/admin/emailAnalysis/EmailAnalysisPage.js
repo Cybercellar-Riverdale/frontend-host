@@ -171,11 +171,21 @@ function EmailAnalysisPage() {
         console.log("ipAnalysis or necessary fields are missing in emailDetails");
     }
 
-    if (emailDetails && emailDetails.domainAnalysis[0]["url"] && emailDetails.domainAnalysis[0]["category"] && emailDetails.domainAnalysis[0]) {
-        domainAnalysisCategory = emailDetails.domainAnalysis[0]["category"];
-        domainAnalysisUrl = emailDetails.domainAnalysis[0]["url"];
-        domainAnalysisStats = emailDetails.domainAnalysis[0];
+    // if (emailDetails && emailDetails.domainAnalysis[0]["url"] && emailDetails.domainAnalysis[0]["category"] && emailDetails.domainAnalysis[0]) {
+    //     domainAnalysisCategory = emailDetails.domainAnalysis[0]["category"];
+    //     domainAnalysisUrl = emailDetails.domainAnalysis[0]["url"];
+    //     domainAnalysisStats = emailDetails.domainAnalysis[0];
+    // }
+
+    if (emailDetails?.domainAnalysis?.length > 0) {
+        const firstDomain = emailDetails.domainAnalysis[0];
+        if (firstDomain.url && firstDomain.category) {
+            domainAnalysisCategory = firstDomain.category;
+            domainAnalysisUrl = firstDomain.url;
+            domainAnalysisStats = firstDomain;
+        }
     }
+    
 
     if(emailDetails && emailDetails.analysisArray) {
         linkAnalysisStats = emailDetails.analysisArray;
@@ -209,7 +219,9 @@ function EmailAnalysisPage() {
     if (emailDetails && emailDetails.fileAnalysis?.data?.attributes) {
         const { sha256, size, names } = emailDetails.fileAnalysis.data.attributes;
         fileAnalysisSHA256 = sha256;
-        fileName = names[0];
+        if (Array.isArray(names) && names.length > 0) {
+            fileName = names[0];
+        }  
         fileSize = formatFileSize(size);
     }
     
@@ -602,7 +614,10 @@ function EmailAnalysisPage() {
                                 whiteSpace="pre-wrap"
                             >
 
-                                <AnalysisCard data={ linkAnalysisStats?.[0] || {} } />
+                                
+                                <AnalysisCard data={ Array.isArray(linkAnalysisStats) ? linkAnalysisStats[0] : {} } />
+
+
 
                                 {/* <AnalysisCard data={ {
   "url": "example.com",
