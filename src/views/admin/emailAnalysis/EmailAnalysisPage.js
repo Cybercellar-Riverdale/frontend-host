@@ -13,6 +13,7 @@ import AuthService from 'services/auth-service';
 import { ReactFlow, Handle, Position, MiniMap, Controls, Background, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import DomainAnalysisCard from './DomainAnalysisCard';
+import LinkRedirectChart from './LinkRedirectChart';
 
 let details = '';
 
@@ -618,22 +619,6 @@ function EmailAnalysisPage() {
                                 <AnalysisCard data={ Array.isArray(linkAnalysisStats) ? linkAnalysisStats[0] : {} } />
 
 
-
-                                {/* <AnalysisCard data={ {
-  "url": "example.com",
-  "severityScore": 8,
-  "severity": "High",
-  "category": "Phishing",
-  "stats": {
-    "harmless": 10,
-    "malicious": 5,
-    "suspicious": 3,
-    "undetected": 1,
-    "timeout": 0
-  }
-} || {} } /> */}
-
-
                             
                             {/* {`Analysis Results: \n${JSON.stringify(linkAnalysisStats, null, 2)} \n`} */}
                                    
@@ -678,31 +663,26 @@ function EmailAnalysisPage() {
                             />
                         </TabPanel>
                         <TabPanel>
-                            <div style={{ width: '100vw', height: '100vh' }}>
-                                <ReactFlow
-                                    nodes={nodes}
-                                    edges={edges}
-                                    nodeTypes={{ custom: CustomNode }}
-                                    // onNodesChange={onNodesChange}
-                                    // onEdgesChange={onEdgesChange}
-                                    // onConnect={onConnect}
-                                    fitView
-                                >
-                                    <Handle
-                                    type="source"
-                                    position={Position.Right} // Horizontal handle
-                                    style={{ top: '50%', background: 'blue', width: 10, height: 10 }}
-                                    />
-                                     <Handle
-                                    type="target"
-                                    position={Position.Left} // Another horizontal handle
-                                    style={{ top: '50%', background: 'red', width: 10, height: 10 }}
-                                    />
-                                    <Controls />
-                                    <MiniMap />
-                                    <Background variant="dots" gap={12} size={1} />
-                                </ReactFlow>
-                            </div>
+                            <LinkRedirectChart 
+                            data={{
+                                finalUrl: 'https://www.amazon.sa/dp/B07DB2C56K?keywords=7artisans%2025mm%20f1.8&geniuslink=true',
+                                redirectChainLength: 2,
+                                redirectCount: 2,
+                                redirectChain: [
+                                  {
+                                    url: 'https://www.amaz0n.sa/book',
+                                    duration: 500,
+                                    sameDomain: false,
+                                    routeSimilarity: 7.1,
+                                  },
+                                  {
+                                    url: 'https://www.amazon.sa/dp/B07DB2C56K?keywords=7artisans%2025mm%20f1.8&geniuslink=true',
+                                    duration: 300,
+                                    sameDomain: true,
+                                    routeSimilarity: 100,
+                                  },
+                                ],
+                              }} />
                         </TabPanel>                        
                     </TabPanels>
                 </Tabs>
