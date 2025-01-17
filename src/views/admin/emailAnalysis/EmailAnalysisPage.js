@@ -159,6 +159,7 @@ function EmailAnalysisPage() {
     let fileSize = null;
     let fileType = null;
     let fileDate = null;
+    let linkRedirects = null;
     
     if (emailDetails && emailDetails.ipAnalysis && emailDetails.ipAnalysis.data.id && emailDetails.ipAnalysis.data && emailDetails.ipAnalysis.data.attributes && emailDetails.ipAnalysis.data.attributes.last_analysis_stats && emailDetails.ipAnalysis.data.attributes.country) {
         ipAnalysisStats = emailDetails.ipAnalysis.data.attributes.last_analysis_stats;
@@ -185,6 +186,11 @@ function EmailAnalysisPage() {
             domainAnalysisUrl = firstDomain.url;
             domainAnalysisStats = firstDomain;
         }
+    }
+
+    if (emailDetails?.linkRedirects) {
+        linkRedirects = emailDetails.linkRedirects;
+        console.log(linkRedirects);
     }
     
 
@@ -663,8 +669,8 @@ function EmailAnalysisPage() {
                             />
                         </TabPanel>
                         <TabPanel>
-                            <LinkRedirectChart 
-                            data={{
+{/* 
+                        {
                                 finalUrl: 'https://www.amazon.sa/dp/B07DB2C56K?keywords=7artisans%2025mm%20f1.8&geniuslink=true',
                                 redirectChainLength: 2,
                                 redirectCount: 2,
@@ -682,7 +688,13 @@ function EmailAnalysisPage() {
                                     routeSimilarity: 100,
                                   },
                                 ],
-                              }} />
+                              } */}
+                            <LinkRedirectChart 
+                            data={linkRedirects} />
+                            {/* <LinkRedirectChart data={
+
+[{"finalUrl":"https://www.amazon.sa/dp/B07DB2C56K?keywords=7artisans%2025mm%20f1.8&geniuslink=true","redirectChainLength":1,"redirectCount":1,"redirectChain":[{"url":"https://www.amazon.sa/dp/B07DB2C56K?keywords=7artisans%2025mm%20f1.8&geniuslink=true","duration":3692,"sameDomain":false,"routeSimilarity":7.142857142857142,"_id":"6789efb1a6203a0ee1f78a19"}],"_id":"6789efb1a6203a0ee1f78a18"}]
+                            } />  */}
                         </TabPanel>                        
                     </TabPanels>
                 </Tabs>
