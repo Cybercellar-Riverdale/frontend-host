@@ -53,6 +53,7 @@ import ThreatTrendsBar from "./components/ThreatTrendsBar";
 import { ToastContainer } from "react-toastify";
 import TrafficBreakDonut from "../mailboxMonitoring/TrafficBreakDonut";
 // import TrafficBreakBar from "./components/TrafficBreakPie";
+import TrustedSenders from "./components/TrustedSender";
 
 export default function UserReports() {
   // Chakra Color Mode
@@ -186,6 +187,8 @@ useEffect(() => {
     fetchData();
   }, []);
 
+
+  
   const tallyEmailCategories = async (arrayOfObjects) => {
     const emailCategories = {
         clean: 0,
@@ -368,6 +371,15 @@ useEffect(() => {
         {/* <WeeklyRevenue /> */}
         {/* <InOutLine /> */}
       </SimpleGrid>
+        
+      <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
+        {months && <RealTimeThreatBar months={months} />}
+        {threatSeverity && <RealTimeThreatPie threatSeverity={threatSeverity} />}
+        {/* Add TrustedSenders component here */}
+        <TrustedSenders />
+      </SimpleGrid>
+
+
       {/* <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
         <ComplexTable
           columnsData={columnsDataComplex}
