@@ -153,7 +153,10 @@ function Login() {
     //   window.location.reload(true);
       // console.log("Correct credentials");
       // return history.push("#/admin/default");
-    try{
+    
+    //////////////////////////////POTENTIAL AUTH ROUTE//////////////////////////////
+    /*
+      try{
       const userData = { email: email, password: password };
   
       const myData = {
@@ -188,7 +191,16 @@ function Login() {
       // }
       console.log(err)
     }
+      */
+    /////////////////////////END OF AUTH ROUTE/////////////////////
+    history.push("/admin/default");
   }
+    
+
+
+
+  
+
   return (
     <DefaultAuth illustrationBackground={illustration} image={illustration}>
       <Flex
