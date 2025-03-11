@@ -2,6 +2,7 @@
   "name": "horizon-ui-chakra",
   "version": "1.0.1",
   "private": true,
+  "homepage": "https://cybercellar-riverdale.github.io/frontend-host/",
   "build": {
     "yarn": "v14.0.0,v16.0.0,v18.0.0",
     "npm": "v14.0.0,v16.0.0,v18.0.0"

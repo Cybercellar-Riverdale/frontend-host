@@ -19,6 +19,13 @@ import { RiArrowUpSFill } from "react-icons/ri";
 export default function TopReceivingBar(props) {
     const { receiverDomains, ...rest } = props;
 
+    // Move useColorModeValue calls to the top
+    const cardShadow = useColorModeValue(
+        "0px 18px 40px rgba(112, 144, 176, 0.12)",
+        "0px 18px 40px rgba(112, 144, 176, 0.12)"
+    );
+    const textColor = useColorModeValue("secondaryGray.900", "white");
+
     if (!receiverDomains) {
         return null;
     }
@@ -36,8 +43,7 @@ export default function TopReceivingBar(props) {
     const barChartDataTopReceiving = [{
         name: "Number of Emails",
         data: top4Values,
-    },
-    ];
+    }];
 
     const barChartOptionsTopReceiving = {
         chart: {
@@ -134,12 +140,7 @@ export default function TopReceivingBar(props) {
             },
         },
     };
-    const cardShadow = useColorModeValue(
-        "0px 18px 40px rgba(112, 144, 176, 0.12)",
-        "0px 18px 40px rgba(112, 144, 176, 0.12)"
-    );
-    // Chakra Color Mode
-    const textColor = useColorModeValue("secondaryGray.900", "white");
+
     return (
         <Card align='center' direction='column' w='100%' {...rest} boxShadow={cardShadow}>
             <Flex justify='space-between' align='start' px='10px' pt='5px'>
